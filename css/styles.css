@@ -14,7 +14,9 @@
   --glass-bg-strong: rgba(255, 255, 255, 0.08);
   --glass-border: rgba(255, 255, 255, 0.12);
   --glass-border-bright: rgba(255, 255, 255, 0.18);
-  --glass-blur: 16px;
+  --glass-blur: 22px;
+  --glass-blur-sm: 14px;
+  --glass-saturate: 1.45;
   --radius-lg: 20px;
   --radius-md: 14px;
   --radius-sm: 10px;
@@ -29,13 +31,39 @@ html {
 
 body {
   margin: 0;
-  min-height: 100dvh;
   font-family: var(--font);
   font-size: 15px;
   font-weight: 400;
   line-height: 1.4;
   color: var(--text);
   background: var(--bg);
+}
+
+/* ——— Ambient background (для видимости backdrop-filter) ——— */
+
+.app {
+  display: flex;
+  position: relative;
+  isolation: isolate;
+}
+
+.app::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 70% 55% at 12% 18%, rgba(72, 88, 140, 0.22), transparent 58%),
+    radial-gradient(ellipse 55% 45% at 88% 12%, rgba(90, 70, 130, 0.16), transparent 52%),
+    radial-gradient(ellipse 60% 50% at 75% 82%, rgba(50, 100, 90, 0.12), transparent 55%),
+    radial-gradient(ellipse 40% 35% at 40% 60%, rgba(255, 255, 255, 0.04), transparent 50%),
+    var(--bg);
+}
+
+.app>* {
+  position: relative;
+  z-index: 1;
 }
 
 a {
@@ -60,14 +88,8 @@ button {
 
 /* ——— Layout ——— */
 
-.app {
-  display: flex;
-  min-height: 100dvh;
-}
-
 .main-wrap {
-  flex: 1;
-  min-width: 0;
+  width: 100%;
   display: flex;
   flex-direction: column;
 }
@@ -84,35 +106,103 @@ button {
   min-height: calc(100dvh - 0px);
 }
 
-@media (min-width: 769px) {
-  .main {
-    min-height: 100dvh;
-  }
+/* ——— Glass (жидкое стекло) ——— */
+
+.glass,
+.glass-panel,
+.glass-bar,
+.topbar,
+.menu-toggle,
+.sidebar-close,
+.nav-item--active,
+.board-col__icon {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: linear-gradient(135deg,
+      rgba(255, 255, 255, 0.14) 0%,
+      rgba(255, 255, 255, 0.05) 38%,
+      rgba(255, 255, 255, 0.02) 100%);
+  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.16),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.04),
+    0 12px 40px rgba(0, 0, 0, 0.45);
+  transition:
+    background var(--transition),
+    border-color var(--transition),
+    box-shadow var(--transition),
+    transform 0.15s ease;
 }
 
-/* ——— Glass utilities ——— */
+.glass::before,
+.glass-panel::before,
+.glass-bar::before,
+.topbar::before,
+.menu-toggle::before,
+.sidebar-close::before,
+.nav-item--active::before,
+.board-col__icon::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(115deg,
+      rgba(255, 255, 255, 0.2) 0%,
+      rgba(255, 255, 255, 0.04) 28%,
+      transparent 48%);
+  pointer-events: none;
+}
 
-.glass-panel,
-.glass-bar {
-  background: linear-gradient(
-    145deg,
-    rgba(255, 255, 255, 0.09) 0%,
-    rgba(255, 255, 255, 0.03) 45%,
-    rgba(255, 255, 255, 0.02) 100%
-  );
-  border: 1px solid var(--glass-border);
-  border-radius: var(--radius-lg);
-  backdrop-filter: blur(var(--glass-blur));
-  -webkit-backdrop-filter: blur(var(--glass-blur));
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.08),
-    0 8px 32px rgba(0, 0, 0, 0.45);
+.board-col__icon {
+  backdrop-filter: blur(var(--glass-blur-sm)) saturate(var(--glass-saturate));
+  -webkit-backdrop-filter: blur(var(--glass-blur-sm)) saturate(var(--glass-saturate));
+}
+
+.menu-toggle:hover,
+.sidebar-close:hover,
+.nav-item:hover:not(.nav-item--active) {
+  background: linear-gradient(135deg,
+      rgba(255, 255, 255, 0.1) 0%,
+      rgba(255, 255, 255, 0.04) 100%);
+  border-color: rgba(255, 255, 255, 0.18);
+}
+
+.menu-toggle:active,
+.sidebar-close:active {
+  transform: scale(0.97);
+}
+
+.nav-item--active:hover {
+  border-color: rgba(255, 255, 255, 0.22);
+  background: linear-gradient(135deg,
+      rgba(255, 255, 255, 0.18) 0%,
+      rgba(255, 255, 255, 0.07) 100%);
 }
 
 @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+
+  .glass,
   .glass-panel,
-  .glass-bar {
-    background: rgba(28, 28, 28, 0.95);
+  .glass-bar,
+  .topbar,
+  .menu-toggle,
+  .sidebar-close,
+  .nav-item--active,
+  .board-col__icon {
+    background: rgba(28, 28, 32, 0.92);
+  }
+
+  .glass::before,
+  .glass-panel::before,
+  .glass-bar::before,
+  .topbar::before,
+  .menu-toggle::before,
+  .sidebar-close::before,
+  .nav-item--active::before,
+  .board-col__icon::before {
+    display: none;
   }
 }
 
@@ -122,9 +212,9 @@ button {
   position: fixed;
   inset: 0;
   z-index: 40;
-  background: rgba(0, 0, 0, 0.6);
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(12px) saturate(1.2);
+  -webkit-backdrop-filter: blur(12px) saturate(1.2);
   opacity: 0;
   transition: opacity var(--transition);
   pointer-events: none;
@@ -143,7 +233,10 @@ button {
   width: var(--sidebar-width);
   height: 100dvh;
   padding: 28px 20px 32px;
-  border-right: 1px solid rgba(255, 255, 255, 0.06);
+  border-right: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(0, 0, 0, 0.25);
+  backdrop-filter: blur(28px) saturate(1.35);
+  -webkit-backdrop-filter: blur(28px) saturate(1.35);
   display: flex;
   flex-direction: column;
   gap: 28px;
@@ -169,8 +262,6 @@ button {
   align-items: center;
   justify-content: center;
   border-radius: var(--radius-sm);
-  border: 1px solid var(--glass-border);
-  background: var(--glass-bg);
 }
 
 .sidebar-close span,
@@ -207,13 +298,13 @@ button {
   transition: background var(--transition);
 }
 
-.nav-item:hover {
-  background: rgba(255, 255, 255, 0.06);
+.nav-item {
+  border: 1px solid transparent;
 }
 
-.nav-item--active {
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+.nav-item:hover:not(.nav-item--active) {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.06);
 }
 
 .icon-img {
@@ -319,7 +410,10 @@ button {
   align-items: center;
   gap: 16px;
   padding: 14px 20px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 0;
+  border-left: none;
+  border-right: none;
+  border-top: none;
 }
 
 .topbar__title {
@@ -336,8 +430,11 @@ button {
   height: 40px;
   padding: 10px;
   border-radius: var(--radius-sm);
-  border: 1px solid var(--glass-border);
-  background: var(--glass-bg);
+}
+
+.menu-toggle span {
+  position: relative;
+  z-index: 1;
 }
 
 .menu-toggle span {
@@ -350,7 +447,13 @@ button {
 
 /* ——— Today / Done bars ——— */
 
+.glass-panel,
 .glass-bar {
+  border-radius: var(--radius-lg);
+}
+
+.glass-bar {
+  height: fit-content;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -359,6 +462,8 @@ button {
 }
 
 .glass-bar__label {
+  position: relative;
+  z-index: 1;
   margin: 0;
   font-size: 16px;
   font-weight: 500;
@@ -370,7 +475,6 @@ button {
 }
 
 .glass-bar--done {
-  margin-top: auto;
   min-height: 72px;
 }
 
@@ -380,7 +484,6 @@ button {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 20px;
-  flex: 1;
   align-items: stretch;
   min-height: 0;
 }
@@ -389,7 +492,8 @@ button {
   display: flex;
   flex-direction: column;
   padding: 22px 20px 24px;
-  min-height: 240px;
+  height: fit-content;
+  min-height: 230px;
 }
 
 .board-col__head {
@@ -406,9 +510,22 @@ button {
   width: 36px;
   height: 36px;
   border-radius: 50%;
-  border: 1px solid var(--glass-border-bright);
-  background: rgba(255, 255, 255, 0.06);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  flex-shrink: 0;
+}
+
+.board-col__icon .icon-img {
+  position: relative;
+  z-index: 1;
+}
+
+.board-col__head,
+.nav-item {
+  z-index: 0;
+}
+
+.nav-item>* {
+  position: relative;
+  z-index: 1;
 }
 
 
@@ -479,8 +596,10 @@ button {
     top: 0;
     transform: translateX(-100%);
     transition: transform var(--transition);
-    background: var(--bg);
-    box-shadow: 8px 0 40px rgba(0, 0, 0, 0.5);
+    background: rgba(0, 0, 0, 0.45);
+    backdrop-filter: blur(32px) saturate(1.4);
+    -webkit-backdrop-filter: blur(32px) saturate(1.4);
+    box-shadow: 8px 0 48px rgba(0, 0, 0, 0.55);
   }
 
   .sidebar.is-open {
