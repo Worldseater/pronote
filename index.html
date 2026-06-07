@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pronote</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <div class="app">
+    <div class="sidebar-overlay" id="sidebarOverlay" hidden></div>
+
+    <aside class="sidebar" id="sidebar" aria-label="Навигация">
+      <div class="sidebar__head">
+        <a href="#/" class="logo" data-route="home">Pronote</a>
+        <button type="button" class="sidebar-close" id="sidebarClose" aria-label="Закрыть меню">
+          <span aria-hidden="true"></span>
+        </button>
+      </div>
+
+      <nav class="sidebar-nav">
+        <a href="#/all" class="nav-item" data-route="all" id="navAll">
+          <img src="svg/grid-svgrepo.svg" alt="" class="icon-img" width="20" height="20" />
+          <span>Все задачи</span>
+        </a>
+        <a href="#" class="nav-item">
+          <img src="svg/user.svg" alt="" class="icon-img" width="20" height="20" />
+          <span>Мои задачи</span>
+        </a>
+
+        <div class="nav-group" id="navGroupIdeas" data-nav-group="ideas">
+          <button
+            type="button"
+            class="nav-item nav-item--toggle"
+            data-nav-toggle
+            id="navIdeas"
+            aria-expanded="false"
+            aria-controls="navSubIdeas"
+          >
+            <img src="svg/light.svg" alt="" class="icon-img" width="20" height="20" />
+            <span>Идеи</span>
+            <span class="nav-item__chevron" aria-hidden="true"></span>
+          </button>
+          <ul class="nav-sub" id="navSubIdeas">
+            <li><a href="#/ideas/new" class="nav-sub__link" data-route="ideas" data-section="new">Новые</a></li>
+            <li><a href="#/ideas/discuss" class="nav-sub__link" data-route="ideas" data-section="discuss">Обсуждаются</a></li>
+            <li><a href="#/ideas/discussed" class="nav-sub__link" data-route="ideas" data-section="discussed">Обсудились</a></li>
+            <li><a href="#/ideas/future" class="nav-sub__link" data-route="ideas" data-section="future">В будущем</a></li>
+          </ul>
+        </div>
+
+        <div class="nav-group" id="navGroupDev" data-nav-group="dev">
+          <button
+            type="button"
+            class="nav-item nav-item--toggle"
+            data-nav-toggle
+            id="navDev"
+            aria-expanded="false"
+            aria-controls="navSubDev"
+          >
+            <img src="svg/brackets.svg" alt="" class="icon-img" width="20" height="20" />
+            <span>Разработка</span>
+            <span class="nav-item__chevron" aria-hidden="true"></span>
+          </button>
+          <ul class="nav-sub" id="navSubDev">
+            <li><a href="#/dev/planned" class="nav-sub__link" data-route="dev" data-section="planned">Планируются</a></li>
+            <li><a href="#/dev/progress" class="nav-sub__link" data-route="dev" data-section="progress">Делаются</a></li>
+            <li><a href="#/dev/postponed" class="nav-sub__link" data-route="dev" data-section="postponed">Отложены</a></li>
+            <li><a href="#/dev/waiting" class="nav-sub__link" data-route="dev" data-section="waiting">Ожидание</a></li>
+          </ul>
+        </div>
+
+        <a href="#/urgent" class="nav-item" data-route="urgent" id="navUrgent">
+          <img src="svg/zap.svg" alt="" class="icon-img" width="20" height="20" />
+          <span>Срочно</span>
+        </a>
+
+        <a href="#/done" class="nav-item nav-item--done" data-route="done" id="navDone">
+          <span class="icon-img icon-img--done" aria-hidden="true">✓</span>
+          <span>Готово</span>
+        </a>
+      </nav>
+    </aside>
+
+    <div class="main-wrap">
+      <header class="topbar">
+        <button type="button" class="menu-toggle" id="menuToggle" aria-label="Открыть меню" aria-expanded="false" aria-controls="sidebar">
+          <span aria-hidden="true"></span>
+          <span aria-hidden="true"></span>
+          <span aria-hidden="true"></span>
+        </button>
+        <span class="topbar__title" id="topbarTitle">Pronote</span>
+      </header>
+
+      <main class="main">
+        <div class="view view--active" id="viewHome" data-view="home">
+        <section class="glass-bar glass-bar--today" aria-label="Сегодня">
+          <header class="today-head">
+            <h1 class="glass-bar__label">Сегодня</h1>
+            <button
+              type="button"
+              class="page-head__add glass today-head__add"
+              id="todayFormToggle"
+              aria-label="Добавить задачу"
+              aria-expanded="false"
+              aria-controls="todayFormPanel"
+            >
+              <span class="page-head__add-icon" aria-hidden="true">+</span>
+            </button>
+          </header>
+
+          <section class="today-form idea-form idea-form--inset glass-panel" id="todayFormPanel" aria-labelledby="todayFormTitle" hidden>
+            <div class="idea-form__head">
+              <h2 class="idea-form__title" id="todayFormTitle">Добавить задачу</h2>
+              <button type="button" class="idea-form__toggle glass" id="todayFormClose" aria-controls="todayFormBody">
+                Свернуть
+              </button>
+            </div>
+            <div class="idea-form__body" id="todayFormBody">
+              <form id="todayForm" novalidate>
+                <label class="field">
+                  <span class="field__label">Заголовок</span>
+                  <input class="field__input" type="text" name="title" required maxlength="200" placeholder="Кратко, о чём задача" autocomplete="off" />
+                </label>
+                <label class="field">
+                  <span class="field__label">Описание</span>
+                  <textarea class="field__input field__input--area" name="text" rows="2" maxlength="2000" placeholder="Детали, контекст…"></textarea>
+                </label>
+                <label class="field">
+                  <span class="field__label">Комментарий</span>
+                  <textarea class="field__input field__input--area" name="comment" rows="2" maxlength="1000" placeholder="Заметка или уточнение…"></textarea>
+                </label>
+                <div class="today-form__row">
+                  <label class="field today-form__field">
+                    <span class="field__label">Раздел</span>
+                    <select class="field__input field__input--select" name="board" id="todayBoardSelect">
+                      <option value="ideas">Идеи</option>
+                      <option value="dev">Разработка</option>
+                      <option value="urgent">Срочно</option>
+                    </select>
+                  </label>
+                  <label class="field today-form__field">
+                    <span class="field__label">Подраздел</span>
+                    <select class="field__input field__input--select" name="section" id="todaySectionSelect"></select>
+                  </label>
+                </div>
+                <p class="idea-form__error" id="todayFormError" hidden></p>
+                <div class="idea-form__actions">
+                  <button type="submit" class="btn-primary glass">Добавить</button>
+                  <button type="reset" class="btn-ghost">Очистить</button>
+                </div>
+              </form>
+            </div>
+          </section>
+
+          <ul class="today-list" id="homeTodayList" aria-label="Задачи, добавленные сегодня"></ul>
+        </section>
+
+        <section class="board" aria-label="Доски задач">
+          <article class="board-col glass-panel board-col--link" data-route="ideas" tabindex="0" aria-label="Перейти к доске Идеи">
+            <header class="board-col__head">
+              <span class="board-col__icon" aria-hidden="true">
+                <img src="svg/light.svg" alt="" class="icon-img icon-img--sm" width="18" height="18" />
+              </span>
+              <h2 class="board-col__title">Идеи</h2>
+              <button
+                type="button"
+                class="board-col__add page-head__add glass"
+                data-board-add-home="ideas"
+                aria-label="Добавить задачу в идеи"
+                aria-expanded="false"
+                aria-controls="todayFormPanel"
+              >
+                <span class="page-head__add-icon" aria-hidden="true">+</span>
+              </button>
+            </header>
+            <ul class="board-col__list">
+              <li><a href="#/ideas/new" data-route="ideas" data-section="new">Новые</a></li>
+              <li><a href="#/ideas/discuss" data-route="ideas" data-section="discuss">Обсуждаются</a></li>
+              <li><a href="#/ideas/discussed" data-route="ideas" data-section="discussed">Обсудились</a></li>
+              <li><a href="#/ideas/future" data-route="ideas" data-section="future">В будущем</a></li>
+            </ul>
+          </article>
+
+          <article class="board-col glass-panel board-col--link" data-route="dev" tabindex="0" aria-label="Перейти к доске Разработка">
+            <header class="board-col__head">
+              <span class="board-col__icon" aria-hidden="true">
+                <img src="svg/brackets.svg" alt="" class="icon-img icon-img--sm" width="18" height="18" />
+              </span>
+              <h2 class="board-col__title">Разработка</h2>
+              <button
+                type="button"
+                class="board-col__add page-head__add glass"
+                data-board-add-home="dev"
+                aria-label="Добавить задачу в разработку"
+                aria-expanded="false"
+                aria-controls="todayFormPanel"
+              >
+                <span class="page-head__add-icon" aria-hidden="true">+</span>
+              </button>
+            </header>
+            <ul class="board-col__list">
+              <li><a href="#/dev/planned" data-route="dev" data-section="planned">Планируются</a></li>
+              <li><a href="#/dev/progress" data-route="dev" data-section="progress">Делаются</a></li>
+              <li><a href="#/dev/postponed" data-route="dev" data-section="postponed">Отложены</a></li>
+              <li><a href="#/dev/waiting" data-route="dev" data-section="waiting">Ожидание</a></li>
+            </ul>
+          </article>
+
+          <article class="board-col glass-panel board-col--link" data-route="urgent" tabindex="0" aria-label="Перейти к доске Срочно">
+            <header class="board-col__head">
+              <span class="board-col__icon" aria-hidden="true">
+                <img src="svg/zap.svg" alt="" class="icon-img icon-img--sm" width="18" height="18" />
+              </span>
+              <h2 class="board-col__title">Срочно</h2>
+              <button
+                type="button"
+                class="board-col__add page-head__add glass"
+                data-board-add-home="urgent"
+                aria-label="Добавить срочную задачу"
+                aria-expanded="false"
+                aria-controls="todayFormPanel"
+              >
+                <span class="page-head__add-icon" aria-hidden="true">+</span>
+              </button>
+            </header>
+            <ul class="board-col__list" id="homeUrgentList">
+            </ul>
+          </article>
+        </section>
+
+        <section class="glass-bar glass-bar--done" aria-label="Готово">
+          <header class="done-head">
+            <h2 class="glass-bar__label">Готово</h2>
+          </header>
+          <ul class="done-list today-list" id="homeDoneList" aria-label="Последние завершённые задачи"></ul>
+        </section>
+        </div>
+
+        <div class="view" id="viewAll" data-view="all" hidden>
+          <div class="all-tasks-page board-page">
+            <section class="ideas-section" id="all-section-list">
+              <div class="ideas-block glass-panel">
+                <header class="ideas-block__head page-head">
+                  <div class="page-head__content">
+                    <p class="page-head__eyebrow">Обзор</p>
+                    <h2 class="page-head__title">Все задачи</h2>
+                    <p class="page-head__meta" id="allTasksMeta">Загрузка…</p>
+                  </div>
+                </header>
+                <div class="all-tasks-toolbar">
+                  <div class="all-tasks-toolbar__grid">
+                    <label class="all-tasks-toolbar__field">
+                      <span class="all-tasks-toolbar__label">Сортировка по дате</span>
+                      <select class="field__input field__input--select all-tasks-toolbar__select" id="allTasksDateSort">
+                        <option value="created">По дате создания</option>
+                        <option value="updated">По дате изменения</option>
+                        <option value="completed">По дате завершения</option>
+                      </select>
+                    </label>
+                    <label class="all-tasks-toolbar__field">
+                      <span class="all-tasks-toolbar__label">Порядок разделов</span>
+                      <select class="field__input field__input--select all-tasks-toolbar__select" id="allTasksBoardOrder">
+                        <option value="none">Все вместе</option>
+                        <option value="ideas">Сначала идеи</option>
+                        <option value="dev">Сначала разработка</option>
+                        <option value="urgent">Сначала срочные</option>
+                      </select>
+                    </label>
+                    <label class="all-tasks-toolbar__field">
+                      <span class="all-tasks-toolbar__label">Раздел</span>
+                      <select class="field__input field__input--select all-tasks-toolbar__select" id="allTasksBoardFilter">
+                        <option value="all">Все разделы</option>
+                        <option value="ideas">Идеи</option>
+                        <option value="dev">Разработка</option>
+                        <option value="urgent">Срочно</option>
+                      </select>
+                    </label>
+                    <label class="all-tasks-toolbar__field">
+                      <span class="all-tasks-toolbar__label">Статус</span>
+                      <select class="field__input field__input--select all-tasks-toolbar__select" id="allTasksStatusFilter">
+                        <option value="all">Все статусы</option>
+                        <option value="active">Активные</option>
+                        <option value="done">Завершённые</option>
+                      </select>
+                    </label>
+                  </div>
+                </div>
+                <div class="ideas-block__body">
+                  <ul class="all-tasks-list today-list" id="allTasksList" aria-label="Все задачи"></ul>
+                </div>
+              </div>
+            </section>
+          </div>
+        </div>
+
+        <div class="view" id="viewDone" data-view="done" hidden>
+          <div class="done-page board-page">
+            <section class="ideas-section" id="done-section-all">
+              <div class="ideas-block glass-panel">
+                <header class="ideas-block__head page-head done-head">
+                  <div class="page-head__content">
+                    <p class="page-head__eyebrow">Архив</p>
+                    <h2 class="page-head__title">Готово</h2>
+                    <p class="page-head__meta" id="donePageMeta">Загрузка…</p>
+                  </div>
+                </header>
+                <div class="ideas-block__body">
+                  <ul class="done-list today-list done-page__list" id="donePageList" aria-label="Завершённые задачи"></ul>
+                </div>
+              </div>
+            </section>
+          </div>
+        </div>
+
+        <div class="view" id="viewIdeas" data-view="ideas" hidden>
+          <div class="ideas-page board-page">
+            <section class="ideas-section" id="ideas-section-new" data-section="new">
+              <div class="ideas-block glass-panel">
+              <header class="ideas-block__head page-head">
+                <div class="page-head__content">
+                  <p class="page-head__eyebrow">Идеи</p>
+                  <h2 class="page-head__title">Новые</h2>
+                  <p class="page-head__meta" data-board-meta="ideas" data-section="new">Загрузка…</p>
+                </div>
+                <button type="button" class="page-head__add glass" data-board-add="ideas" data-section="new" aria-label="Добавить идею" aria-expanded="false" aria-controls="ideaFormPanel">
+                  <span class="page-head__add-icon" aria-hidden="true">+</span>
+                </button>
+              </header>
+
+              <section class="idea-form idea-form--inset" id="ideaFormPanel" aria-labelledby="ideaFormTitle" hidden>
+                <div class="idea-form__head">
+                  <h3 class="idea-form__title" id="ideaFormTitle">Добавить идею</h3>
+                  <button type="button" class="idea-form__toggle glass" id="ideaFormToggle" aria-expanded="false" aria-controls="ideaFormBody">
+                    Свернуть
+                  </button>
+                </div>
+                <div class="idea-form__body" id="ideaFormBody">
+                  <form id="ideaForm" novalidate>
+                    <label class="field">
+                      <span class="field__label">Заголовок</span>
+                      <input class="field__input" type="text" name="title" required maxlength="200" placeholder="Кратко, о чём идея" autocomplete="off" />
+                    </label>
+                    <label class="field">
+                      <span class="field__label">Описание</span>
+                      <textarea class="field__input field__input--area" name="text" rows="3" maxlength="2000" placeholder="Детали, контекст, ссылки…"></textarea>
+                    </label>
+                    <label class="field">
+                      <span class="field__label">Комментарий</span>
+                      <textarea class="field__input field__input--area" name="comment" rows="2" maxlength="1000" placeholder="Заметка или уточнение…"></textarea>
+                    </label>
+                    <p class="idea-form__error" id="ideaFormError" hidden></p>
+                    <div class="idea-form__actions">
+                      <button type="submit" class="btn-primary glass">Сохранить идею</button>
+                      <button type="reset" class="btn-ghost">Очистить</button>
+                    </div>
+                  </form>
+                </div>
+              </section>
+
+              <div class="ideas-block__body" data-board-body="ideas" data-section="new" hidden>
+                <ul class="idea-list" data-board-list="ideas" data-section="new" aria-label="Список новых идей"></ul>
+              </div>
+              </div>
+            </section>
+
+            <section class="ideas-section" id="ideas-section-discuss" data-section="discuss">
+              <div class="ideas-block glass-panel">
+              <header class="ideas-block__head page-head">
+                <div class="page-head__content">
+                  <p class="page-head__eyebrow">Идеи</p>
+                  <h2 class="page-head__title">Обсуждаются</h2>
+                  <p class="page-head__meta" data-board-meta="ideas" data-section="discuss">Нет идей</p>
+                </div>
+                <button type="button" class="page-head__add glass" data-board-add="ideas" data-section="discuss" aria-label="Добавить идею" aria-expanded="false" aria-controls="ideaFormPanel">
+                  <span class="page-head__add-icon" aria-hidden="true">+</span>
+                </button>
+              </header>
+              <div class="ideas-block__body" data-board-body="ideas" data-section="discuss" hidden>
+                <ul class="idea-list" data-board-list="ideas" data-section="discuss" aria-label="Идеи на обсуждении"></ul>
+              </div>
+              </div>
+            </section>
+
+            <section class="ideas-section" id="ideas-section-discussed" data-section="discussed">
+              <div class="ideas-block glass-panel">
+              <header class="ideas-block__head page-head">
+                <div class="page-head__content">
+                  <p class="page-head__eyebrow">Идеи</p>
+                  <h2 class="page-head__title">Обсудились</h2>
+                  <p class="page-head__meta" data-board-meta="ideas" data-section="discussed">Нет идей</p>
+                </div>
+                <button type="button" class="page-head__add glass" data-board-add="ideas" data-section="discussed" aria-label="Добавить идею" aria-expanded="false" aria-controls="ideaFormPanel">
+                  <span class="page-head__add-icon" aria-hidden="true">+</span>
+                </button>
+              </header>
+              <div class="ideas-block__body" data-board-body="ideas" data-section="discussed" hidden>
+                <ul class="idea-list" data-board-list="ideas" data-section="discussed" aria-label="Обсуждённые идеи"></ul>
+              </div>
+              </div>
+            </section>
+
+            <section class="ideas-section" id="ideas-section-future" data-section="future">
+              <div class="ideas-block glass-panel">
+              <header class="ideas-block__head page-head">
+                <div class="page-head__content">
+                  <p class="page-head__eyebrow">Идеи</p>
+                  <h2 class="page-head__title">В будущем</h2>
+                  <p class="page-head__meta" data-board-meta="ideas" data-section="future">Нет идей</p>
+                </div>
+                <button type="button" class="page-head__add glass" data-board-add="ideas" data-section="future" aria-label="Добавить идею" aria-expanded="false" aria-controls="ideaFormPanel">
+                  <span class="page-head__add-icon" aria-hidden="true">+</span>
+                </button>
+              </header>
+              <div class="ideas-block__body" data-board-body="ideas" data-section="future" hidden>
+                <ul class="idea-list" data-board-list="ideas" data-section="future" aria-label="Идеи на будущее"></ul>
+              </div>
+              </div>
+            </section>
+          </div>
+        </div>
+
+        <div class="view" id="viewDev" data-view="dev" hidden>
+          <div class="ideas-page board-page">
+            <section class="ideas-section" id="dev-section-planned" data-section="planned">
+              <div class="ideas-block glass-panel">
+                <header class="ideas-block__head page-head">
+                  <div class="page-head__content">
+                    <p class="page-head__eyebrow">Разработка</p>
+                    <h2 class="page-head__title">Планируются</h2>
+                    <p class="page-head__meta" data-board-meta="dev" data-section="planned">Нет задач</p>
+                  </div>
+                  <button type="button" class="page-head__add glass" data-board-add="dev" data-section="planned" aria-label="Добавить задачу" aria-expanded="false" aria-controls="devFormPanel">
+                    <span class="page-head__add-icon" aria-hidden="true">+</span>
+                  </button>
+                </header>
+                <section class="idea-form idea-form--inset" id="devFormPanel" aria-labelledby="devFormTitle" hidden>
+                  <div class="idea-form__head">
+                    <h3 class="idea-form__title" id="devFormTitle">Добавить задачу</h3>
+                    <button type="button" class="idea-form__toggle glass" id="devFormToggle" aria-expanded="false">Свернуть</button>
+                  </div>
+                  <div class="idea-form__body">
+                    <form id="devForm" novalidate>
+                      <label class="field">
+                        <span class="field__label">Заголовок</span>
+                        <input class="field__input" type="text" name="title" required maxlength="200" placeholder="Кратко, о чём задача" autocomplete="off" />
+                      </label>
+                      <label class="field">
+                        <span class="field__label">Описание</span>
+                        <textarea class="field__input field__input--area" name="text" rows="3" maxlength="2000" placeholder="Детали, контекст…"></textarea>
+                      </label>
+                      <label class="field">
+                        <span class="field__label">Комментарий</span>
+                        <textarea class="field__input field__input--area" name="comment" rows="2" maxlength="1000" placeholder="Заметка или уточнение…"></textarea>
+                      </label>
+                      <p class="idea-form__error" id="devFormError" hidden></p>
+                      <div class="idea-form__actions">
+                        <button type="submit" class="btn-primary glass">Сохранить задачу</button>
+                        <button type="reset" class="btn-ghost">Очистить</button>
+                      </div>
+                    </form>
+                  </div>
+                </section>
+                <div class="ideas-block__body" data-board-body="dev" data-section="planned" hidden>
+                  <ul class="idea-list" data-board-list="dev" data-section="planned" aria-label="Планируются"></ul>
+                </div>
+              </div>
+            </section>
+
+            <section class="ideas-section" id="dev-section-progress" data-section="progress">
+              <div class="ideas-block glass-panel">
+                <header class="ideas-block__head page-head">
+                  <div class="page-head__content">
+                    <p class="page-head__eyebrow">Разработка</p>
+                    <h2 class="page-head__title">Делаются</h2>
+                    <p class="page-head__meta" data-board-meta="dev" data-section="progress">Нет задач</p>
+                  </div>
+                  <button type="button" class="page-head__add glass" data-board-add="dev" data-section="progress" aria-label="Добавить задачу" aria-expanded="false" aria-controls="devFormPanel">
+                    <span class="page-head__add-icon" aria-hidden="true">+</span>
+                  </button>
+                </header>
+                <div class="ideas-block__body" data-board-body="dev" data-section="progress" hidden>
+                  <ul class="idea-list" data-board-list="dev" data-section="progress" aria-label="Делаются"></ul>
+                </div>
+              </div>
+            </section>
+
+            <section class="ideas-section" id="dev-section-postponed" data-section="postponed">
+              <div class="ideas-block glass-panel">
+                <header class="ideas-block__head page-head">
+                  <div class="page-head__content">
+                    <p class="page-head__eyebrow">Разработка</p>
+                    <h2 class="page-head__title">Отложены</h2>
+                    <p class="page-head__meta" data-board-meta="dev" data-section="postponed">Нет задач</p>
+                  </div>
+                  <button type="button" class="page-head__add glass" data-board-add="dev" data-section="postponed" aria-label="Добавить задачу" aria-expanded="false" aria-controls="devFormPanel">
+                    <span class="page-head__add-icon" aria-hidden="true">+</span>
+                  </button>
+                </header>
+                <div class="ideas-block__body" data-board-body="dev" data-section="postponed" hidden>
+                  <ul class="idea-list" data-board-list="dev" data-section="postponed" aria-label="Отложены"></ul>
+                </div>
+              </div>
+            </section>
+
+            <section class="ideas-section" id="dev-section-waiting" data-section="waiting">
+              <div class="ideas-block glass-panel">
+                <header class="ideas-block__head page-head">
+                  <div class="page-head__content">
+                    <p class="page-head__eyebrow">Разработка</p>
+                    <h2 class="page-head__title">Ожидание</h2>
+                    <p class="page-head__meta" data-board-meta="dev" data-section="waiting">Нет задач</p>
+                  </div>
+                  <button type="button" class="page-head__add glass" data-board-add="dev" data-section="waiting" aria-label="Добавить задачу" aria-expanded="false" aria-controls="devFormPanel">
+                    <span class="page-head__add-icon" aria-hidden="true">+</span>
+                  </button>
+                </header>
+                <div class="ideas-block__body" data-board-body="dev" data-section="waiting" hidden>
+                  <ul class="idea-list" data-board-list="dev" data-section="waiting" aria-label="Ожидание"></ul>
+                </div>
+              </div>
+            </section>
+          </div>
+        </div>
+
+        <div class="view" id="viewUrgent" data-view="urgent" hidden>
+          <div class="ideas-page board-page">
+            <section class="ideas-section" id="urgent-section-main" data-section="main">
+              <div class="ideas-block glass-panel">
+                <header class="ideas-block__head page-head">
+                  <div class="page-head__content">
+                    <p class="page-head__eyebrow">Срочно</p>
+                    <h2 class="page-head__title">Срочные задачи</h2>
+                    <p class="page-head__meta" data-board-meta="urgent" data-section="main">Нет задач</p>
+                  </div>
+                  <button type="button" class="page-head__add glass" data-board-add="urgent" data-section="main" aria-label="Добавить задачу" aria-expanded="false" aria-controls="urgentFormPanel">
+                    <span class="page-head__add-icon" aria-hidden="true">+</span>
+                  </button>
+                </header>
+                <section class="idea-form idea-form--inset" id="urgentFormPanel" aria-labelledby="urgentFormTitle" hidden>
+                  <div class="idea-form__head">
+                    <h3 class="idea-form__title" id="urgentFormTitle">Добавить задачу</h3>
+                    <button type="button" class="idea-form__toggle glass" id="urgentFormToggle" aria-expanded="false">Свернуть</button>
+                  </div>
+                  <div class="idea-form__body">
+                    <form id="urgentForm" novalidate>
+                      <label class="field">
+                        <span class="field__label">Заголовок</span>
+                        <input class="field__input" type="text" name="title" required maxlength="200" placeholder="Кратко, о чём задача" autocomplete="off" />
+                      </label>
+                      <label class="field">
+                        <span class="field__label">Описание</span>
+                        <textarea class="field__input field__input--area" name="text" rows="3" maxlength="2000" placeholder="Детали, контекст…"></textarea>
+                      </label>
+                      <label class="field">
+                        <span class="field__label">Комментарий</span>
+                        <textarea class="field__input field__input--area" name="comment" rows="2" maxlength="1000" placeholder="Заметка или уточнение…"></textarea>
+                      </label>
+                      <p class="idea-form__error" id="urgentFormError" hidden></p>
+                      <div class="idea-form__actions">
+                        <button type="submit" class="btn-primary glass">Сохранить задачу</button>
+                        <button type="reset" class="btn-ghost">Очистить</button>
+                      </div>
+                    </form>
+                  </div>
+                </section>
+                <div class="ideas-block__body" data-board-body="urgent" data-section="main" hidden>
+                  <ul class="idea-list" data-board-list="urgent" data-section="main" aria-label="Срочные задачи"></ul>
+                </div>
+              </div>
+            </section>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <div class="modal" id="editModal" hidden>
+    <div class="modal__backdrop" id="editModalBackdrop" aria-hidden="true"></div>
+    <div
+      class="modal__dialog modal__dialog--form glass-panel"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="editModalTitle"
+    >
+      <h2 class="modal__title" id="editModalTitle">Редактировать задачу</h2>
+      <form id="editItemForm" class="edit-item-form" novalidate>
+        <label class="field">
+          <span class="field__label">Заголовок</span>
+          <input class="field__input" type="text" name="title" required maxlength="200" autocomplete="off" />
+        </label>
+        <label class="field">
+          <span class="field__label">Описание</span>
+          <textarea class="field__input field__input--area" name="text" rows="3" maxlength="2000"></textarea>
+        </label>
+        <div class="edit-item-form__row">
+          <label class="field edit-item-form__field" id="editBoardField">
+            <span class="field__label">Раздел</span>
+            <select class="field__input field__input--select" name="board" id="editBoardSelect"></select>
+          </label>
+          <label class="field edit-item-form__field" id="editSectionField">
+            <span class="field__label">Подраздел</span>
+            <select class="field__input field__input--select" name="section" id="editSectionSelect"></select>
+          </label>
+        </div>
+        <div class="comments-block" id="editCommentsBlock" hidden>
+          <p class="comments-block__label">Комментарии</p>
+          <ul class="comments-list" id="editCommentsList"></ul>
+        </div>
+        <label class="field" id="editCommentField">
+          <span class="field__label" id="editCommentLabel">Комментарий</span>
+          <textarea class="field__input field__input--area" name="comment" id="editCommentInput" rows="2" maxlength="1000" placeholder="Заметка или уточнение…"></textarea>
+        </label>
+        <p class="idea-form__error" id="editItemFormError" hidden></p>
+        <div class="modal__actions modal__actions--split">
+          <button type="button" class="btn-complete glass" id="editModalComplete">Завершить</button>
+          <div class="modal__actions-group">
+            <button type="button" class="btn-ghost" id="editModalCancel">Отмена</button>
+            <button type="submit" class="btn-primary glass">Сохранить</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="modal" id="confirmModal" hidden>
+    <div class="modal__backdrop" id="confirmModalBackdrop" aria-hidden="true"></div>
+    <div
+      class="modal__dialog glass-panel"
+      role="alertdialog"
+      aria-modal="true"
+      aria-labelledby="confirmModalTitle"
+      aria-describedby="confirmModalMessage"
+    >
+      <h2 class="modal__title" id="confirmModalTitle">Удалить идею?</h2>
+      <p class="modal__message" id="confirmModalMessage"></p>
+      <div class="modal__actions">
+        <button type="button" class="btn-ghost" id="confirmModalCancel">Отмена</button>
+        <button type="button" class="btn-danger glass" id="confirmModalConfirm">Удалить</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/confirm-modal.js"></script>
+  <script src="js/item-edit-modal.js"></script>
+  <script src="js/board-page.js"></script>
+  <script src="js/home-today.js"></script>
+  <script src="js/done.js"></script>
+  <script src="js/all-tasks.js"></script>
+  <script src="js/ideas.js"></script>
+  <script src="js/dev.js"></script>
+  <script src="js/urgent.js"></script>
+  <script src="js/app.js"></script>
+  <script>
+    if (window.PronoteApp) window.PronoteApp.boot();
+  </script>
+</body>
+</html>
