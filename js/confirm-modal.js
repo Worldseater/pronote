@@ -5,25 +5,45 @@
   const messageEl = document.getElementById("confirmModalMessage");
   const cancelBtn = document.getElementById("confirmModalCancel");
   const confirmBtn = document.getElementById("confirmModalConfirm");
+  const actionsEl = cancelBtn && cancelBtn.parentElement;
 
-  if (!modal || !cancelBtn || !confirmBtn) return;
+  if (!modal || !cancelBtn || !confirmBtn || !actionsEl) return;
 
   let onConfirm = null;
   let lastFocus = null;
 
-  function close() {
+  function setButtonOrder(swapButtons) {
+    if (swapButtons) {
+      actionsEl.insertBefore(confirmBtn, cancelBtn);
+      return;
+    }
+
+    actionsEl.insertBefore(cancelBtn, confirmBtn);
+  }
+
+  function getFocusableButtons() {
+    return Array.from(actionsEl.querySelectorAll("button"));
+  }
+
+  function close(options) {
+    const opts = options || {};
     modal.hidden = true;
     document.body.classList.remove("modal-open");
     onConfirm = null;
-    if (lastFocus && typeof lastFocus.focus === "function") {
-      lastFocus.focus();
+    setButtonOrder(false);
+    if (!opts.keepLastFocus) {
+      if (lastFocus && typeof lastFocus.focus === "function") {
+        lastFocus.focus();
+      }
+      lastFocus = null;
     }
-    lastFocus = null;
   }
 
   function open(options) {
     const opts = options || {};
-    lastFocus = document.activeElement;
+    if (!opts.preserveFocus) {
+      lastFocus = document.activeElement;
+    }
 
     if (titleEl) titleEl.textContent = opts.title || "Подтвердите действие";
     if (messageEl) {
@@ -31,6 +51,7 @@
       messageEl.hidden = !opts.message;
     }
     confirmBtn.textContent = opts.confirmLabel || "Удалить";
+    setButtonOrder(!!opts.swapButtons);
 
     onConfirm = typeof opts.onConfirm === "function" ? opts.onConfirm : null;
 
@@ -40,8 +61,14 @@
   }
 
   function handleConfirm() {
-    if (onConfirm) onConfirm();
-    close();
+    if (!onConfirm) {
+      close();
+      return;
+    }
+
+    const callback = onConfirm;
+    close({ keepLastFocus: true });
+    callback();
   }
 
   confirmBtn.addEventListener("click", handleConfirm);
@@ -58,7 +85,7 @@
       close();
     }
     if (e.key === "Tab") {
-      const nodes = [cancelBtn, confirmBtn];
+      const nodes = getFocusableButtons();
       const first = nodes[0];
       const last = nodes[nodes.length - 1];
       if (e.shiftKey && document.activeElement === first) {

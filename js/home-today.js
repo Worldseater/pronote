@@ -115,6 +115,13 @@
     return datePart + ", " + timePart;
   }
 
+  function getSectionLabel(board, status) {
+    const section = (board.sections || []).find(function (entry) {
+      return entry.id === status;
+    });
+    return section ? section.label : "";
+  }
+
   function collectTodayItems() {
     const today = [];
 
@@ -131,10 +138,12 @@
           title: item.title || "Без названия",
           createdAt: item.createdAt,
           updatedAt: item.updatedAt,
+          projectId: item.projectId,
           route: board.route,
           section: status,
           href: getItemHash(board, item),
-          tag: board.tag,
+          boardTag: board.tag,
+          statusLabel: getSectionLabel(board, status),
         });
       });
     });
@@ -162,49 +171,19 @@
     }
 
     items.forEach(function (item) {
-      const li = document.createElement("li");
-      li.className = "today-list__row";
-
-      const titleCell = document.createElement("div");
-      titleCell.className = "today-list__title-cell";
-
-      const a = document.createElement("a");
-      a.className = "today-list__title";
-      a.href = item.href;
-      a.setAttribute("data-route", item.route);
-      if (item.section) {
-        a.setAttribute("data-section", item.section);
+      if (window.PronoteRenderHomeTaskRow) {
+        window.PronoteRenderHomeTaskRow(listEl, {
+          title: item.title,
+          boardTag: item.boardTag,
+          statusLabel: item.statusLabel,
+          projectId: item.projectId,
+          onTitleClick: function () {
+            if (window.PronoteEditItem && typeof window.PronoteEditItem.open === "function") {
+              window.PronoteEditItem.open(item.route, item.id);
+            }
+          },
+        });
       }
-      a.textContent = item.title;
-      a.addEventListener("click", function (e) {
-        e.preventDefault();
-        if (window.PronoteEditItem && typeof window.PronoteEditItem.open === "function") {
-          window.PronoteEditItem.open(item.route, item.id);
-        }
-      });
-      titleCell.appendChild(a);
-
-      if (item.updatedAt) {
-        const modified = document.createElement("span");
-        modified.className = "today-list__modified";
-        modified.textContent = "Изменено";
-        titleCell.appendChild(modified);
-      }
-
-      li.appendChild(titleCell);
-
-      const tag = document.createElement("span");
-      tag.className = "today-list__tag";
-      tag.textContent = item.tag;
-      li.appendChild(tag);
-
-      const time = document.createElement("time");
-      time.className = "today-list__time";
-      time.dateTime = item.createdAt || "";
-      time.textContent = formatDateTimeAdded(item.createdAt);
-      li.appendChild(time);
-
-      listEl.appendChild(li);
     });
   }
 
@@ -327,6 +306,10 @@
       text: text,
       comment: String(fd.get("comment") || ""),
       status: section,
+      projectId:
+        window.PronoteProjectPicker && typeof window.PronoteProjectPicker.resolve === "function"
+          ? window.PronoteProjectPicker.resolve(form)
+          : null,
     });
 
     if (!ok) {
@@ -334,11 +317,21 @@
       return;
     }
 
+    if (
+      window.PronoteProjectPicker &&
+      typeof window.PronoteProjectPicker.refreshAll === "function"
+    ) {
+      window.PronoteProjectPicker.refreshAll();
+    }
+
     if (boardRoute === "urgent" && typeof window.renderHomeUrgentPreview === "function") {
       window.renderHomeUrgentPreview();
     }
 
     form.reset();
+    if (window.PronoteProjectPicker && typeof window.PronoteProjectPicker.reset === "function") {
+      window.PronoteProjectPicker.reset(form);
+    }
     handleBoardChange();
     showFormError("");
     setFormOpen(false);
@@ -357,6 +350,12 @@
     });
     form.addEventListener("reset", function () {
       window.requestAnimationFrame(function () {
+        if (
+          window.PronoteProjectPicker &&
+          typeof window.PronoteProjectPicker.reset === "function"
+        ) {
+          window.PronoteProjectPicker.reset(form);
+        }
         handleBoardChange();
         showFormError("");
       });

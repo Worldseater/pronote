@@ -225,13 +225,23 @@
         html += '<p class="idea-card__text">' + escapeHtml(item.text) + "</p>";
       }
       html += renderCommentsHtml(item.comments);
-      if (tag || dateStr) {
+      const projectBadge =
+        item.projectId && window.PronoteProjects
+          ? window.PronoteProjects.renderBadgeHtml(item.projectId)
+          : "";
+      if (projectBadge || tag || dateStr) {
         html += '<footer class="idea-card__foot">';
+        html += '<div class="idea-card__foot-left">';
+        if (projectBadge) {
+          html += projectBadge;
+        }
         if (tag) {
           html += '<span class="idea-card__tag">' + escapeHtml(tag) + "</span>";
-        } else {
+        }
+        if (!projectBadge && !tag) {
           html += "<span></span>";
         }
+        html += "</div>";
         if (dateStr) {
           html +=
             '<time class="idea-card__date" datetime="' +
@@ -256,6 +266,9 @@
       }
       if (typeof window.renderAllTasksPage === "function") {
         window.renderAllTasksPage();
+      }
+      if (typeof window.renderProjectsPage === "function") {
+        window.renderProjectsPage();
       }
       if (boardId === "urgent" && typeof window.renderHomeUrgentPreview === "function") {
         window.renderHomeUrgentPreview();
@@ -378,6 +391,10 @@
         comments: appendComment([], data.comment),
       };
 
+      if (data.projectId) {
+        item.projectId = data.projectId;
+      }
+
       const items = loadItems();
       items.unshift(item);
       saveItems(items);
@@ -457,6 +474,12 @@
         updatedAt: new Date().toISOString(),
       });
 
+      if (data.projectId) {
+        updated.projectId = data.projectId;
+      } else {
+        delete updated.projectId;
+      }
+
       items[index] = updated;
       saveItems(items);
       render();
@@ -511,15 +534,42 @@
           title: fd.get("title"),
           text: fd.get("text"),
           comment: fd.get("comment"),
+          projectId:
+            window.PronoteProjectPicker && typeof window.PronoteProjectPicker.resolve === "function"
+              ? window.PronoteProjectPicker.resolve(form)
+              : null,
         };
         if (addItem(payload)) {
           form.reset();
+          if (
+            window.PronoteProjectPicker &&
+            typeof window.PronoteProjectPicker.reset === "function"
+          ) {
+            window.PronoteProjectPicker.reset(form);
+          }
+          if (
+            window.PronoteProjectPicker &&
+            typeof window.PronoteProjectPicker.refreshAll === "function"
+          ) {
+            window.PronoteProjectPicker.refreshAll();
+          }
           closeFormPanel();
         }
       });
 
       form.addEventListener("input", function () {
         showError("");
+      });
+
+      form.addEventListener("reset", function () {
+        window.requestAnimationFrame(function () {
+          if (
+            window.PronoteProjectPicker &&
+            typeof window.PronoteProjectPicker.reset === "function"
+          ) {
+            window.PronoteProjectPicker.reset(form);
+          }
+        });
       });
     }
 

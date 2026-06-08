@@ -1,0 +1,248 @@
+/* Pronote — цветовые темы */
+
+[data-theme="gold"] {
+  --bg: #080604;
+  --text: #f8f0e0;
+  --text-muted: rgba(248, 240, 224, 0.58);
+  --color-scheme: dark;
+  --theme-accent: #d4a855;
+  --theme-toggle-filter: brightness(0) invert(0.9) sepia(0.55) saturate(3.2) hue-rotate(5deg);
+  --theme-accent-ring: rgba(212, 168, 85, 0.35);
+  --surface-sidebar: rgba(16, 10, 4, 0.62);
+  --surface-sidebar-border: rgba(212, 168, 85, 0.14);
+  --overlay-bg: rgba(4, 2, 0, 0.62);
+  --glass-border: rgba(212, 168, 85, 0.2);
+  --glass-border-bright: rgba(212, 168, 85, 0.32);
+  --glass-border-soft: rgba(212, 168, 85, 0.1);
+  --glass-bg-start: rgba(212, 168, 85, 0.16);
+  --glass-bg-mid: rgba(120, 90, 40, 0.1);
+  --glass-bg-end: rgba(40, 28, 12, 0.2);
+  --glass-shine: rgba(255, 228, 170, 0.22);
+  --glass-shine-mid: rgba(212, 168, 85, 0.08);
+  --glass-inset-top: rgba(255, 228, 170, 0.18);
+  --glass-inset-bottom: rgba(40, 28, 12, 0.2);
+  --glass-shadow: rgba(0, 0, 0, 0.5);
+  --glass-fallback: rgba(24, 16, 8, 0.94);
+  --glass-hover-start: rgba(212, 168, 85, 0.14);
+  --glass-hover-end: rgba(80, 56, 24, 0.12);
+  --glass-active-start: rgba(212, 168, 85, 0.22);
+  --glass-active-end: rgba(80, 56, 24, 0.16);
+  --ambient-1: rgba(212, 168, 85, 0.2);
+  --ambient-2: rgba(160, 110, 40, 0.16);
+  --ambient-3: rgba(90, 60, 20, 0.14);
+  --ambient-4: rgba(255, 220, 150, 0.05);
+  --bullet-color: rgba(212, 168, 85, 0.45);
+  --row-divider: rgba(212, 168, 85, 0.1);
+  --icon-filter: brightness(0) invert(1);
+  --field-bg: rgba(20, 12, 4, 0.55);
+  --field-border: rgba(212, 168, 85, 0.2);
+  --field-placeholder: rgba(248, 240, 224, 0.38);
+  --field-focus-border: rgba(212, 168, 85, 0.42);
+  --field-focus-ring: rgba(212, 168, 85, 0.14);
+  --field-option-bg: #1a1208;
+  --done-accent: #d4b86a;
+  --done-accent-bright: #f0dfa0;
+  --done-accent-muted: rgba(212, 184, 106, 0.58);
+  --done-border: rgba(212, 184, 106, 0.3);
+  --done-border-soft: rgba(212, 184, 106, 0.12);
+  --done-bg: rgba(28, 18, 8, 0.86);
+  --done-glow: 0 0 24px rgba(212, 168, 85, 0.1);
+}
+
+[data-theme="leather"] {
+  --bg: #17100a;
+  --text: #f2e8d8;
+  --text-muted: rgba(242, 232, 216, 0.6);
+  --color-scheme: dark;
+  --theme-accent: #9a5f33;
+  --theme-toggle-filter: brightness(0) invert(0.86) sepia(0.45) saturate(2.4) hue-rotate(350deg);
+  --theme-accent-ring: rgba(154, 95, 51, 0.35);
+  --surface-sidebar: rgba(42, 26, 14, 0.72);
+  --surface-sidebar-border: rgba(180, 120, 72, 0.16);
+  --overlay-bg: rgba(8, 4, 0, 0.65);
+  --glass-border: rgba(180, 120, 72, 0.2);
+  --glass-border-bright: rgba(196, 136, 84, 0.3);
+  --glass-border-soft: rgba(120, 72, 40, 0.12);
+  --glass-bg-start: rgba(120, 72, 40, 0.22);
+  --glass-bg-mid: rgba(60, 36, 20, 0.16);
+  --glass-bg-end: rgba(30, 18, 10, 0.24);
+  --glass-shine: rgba(220, 170, 120, 0.18);
+  --glass-shine-mid: rgba(120, 72, 40, 0.08);
+  --glass-inset-top: rgba(220, 170, 120, 0.14);
+  --glass-inset-bottom: rgba(20, 12, 6, 0.22);
+  --glass-shadow: rgba(0, 0, 0, 0.52);
+  --glass-fallback: rgba(36, 22, 12, 0.94);
+  --glass-hover-start: rgba(120, 72, 40, 0.2);
+  --glass-hover-end: rgba(50, 30, 16, 0.14);
+  --glass-active-start: rgba(154, 95, 51, 0.28);
+  --glass-active-end: rgba(50, 30, 16, 0.18);
+  --ambient-1: rgba(120, 72, 40, 0.34);
+  --ambient-2: rgba(80, 48, 24, 0.28);
+  --ambient-3: rgba(50, 30, 16, 0.22);
+  --ambient-4: rgba(200, 150, 100, 0.06);
+  --bullet-color: rgba(196, 136, 84, 0.42);
+  --row-divider: rgba(120, 72, 40, 0.14);
+  --icon-filter: brightness(0) invert(1);
+  --field-bg: rgba(24, 14, 8, 0.62);
+  --field-border: rgba(180, 120, 72, 0.22);
+  --field-placeholder: rgba(242, 232, 216, 0.4);
+  --field-focus-border: rgba(196, 136, 84, 0.44);
+  --field-focus-ring: rgba(154, 95, 51, 0.16);
+  --field-option-bg: #24160c;
+  --done-accent: #c4956a;
+  --done-accent-bright: #e0b892;
+  --done-accent-muted: rgba(196, 149, 106, 0.58);
+  --done-border: rgba(196, 149, 106, 0.3);
+  --done-border-soft: rgba(196, 149, 106, 0.12);
+  --done-bg: rgba(34, 20, 12, 0.88);
+  --done-glow: 0 0 24px rgba(154, 95, 51, 0.1);
+}
+
+[data-theme="milk"] {
+  --bg: #ebe4d8;
+  --text: #4a4238;
+  --text-muted: rgba(74, 66, 56, 0.64);
+  --color-scheme: light;
+  --theme-accent: #c8b9a4;
+  --theme-toggle-filter: brightness(0) saturate(100%) opacity(0.72);
+  --theme-accent-ring: rgba(120, 100, 80, 0.18);
+  --surface-sidebar: rgba(248, 244, 236, 0.82);
+  --surface-sidebar-border: rgba(120, 100, 80, 0.12);
+  --overlay-bg: rgba(74, 66, 56, 0.28);
+  --glass-border: rgba(120, 100, 80, 0.14);
+  --glass-border-bright: rgba(120, 100, 80, 0.22);
+  --glass-border-soft: rgba(120, 100, 80, 0.08);
+  --glass-bg-start: rgba(255, 252, 246, 0.92);
+  --glass-bg-mid: rgba(245, 238, 226, 0.78);
+  --glass-bg-end: rgba(232, 222, 208, 0.62);
+  --glass-shine: rgba(255, 255, 255, 0.72);
+  --glass-shine-mid: rgba(255, 255, 255, 0.2);
+  --glass-inset-top: rgba(255, 255, 255, 0.65);
+  --glass-inset-bottom: rgba(120, 100, 80, 0.06);
+  --glass-shadow: rgba(74, 66, 56, 0.1);
+  --glass-fallback: rgba(248, 244, 236, 0.96);
+  --glass-hover-start: rgba(255, 252, 246, 0.96);
+  --glass-hover-end: rgba(240, 232, 220, 0.82);
+  --glass-active-start: rgba(255, 255, 255, 0.98);
+  --glass-active-end: rgba(232, 222, 208, 0.88);
+  --ambient-1: rgba(200, 180, 150, 0.28);
+  --ambient-2: rgba(180, 160, 130, 0.2);
+  --ambient-3: rgba(220, 210, 190, 0.24);
+  --ambient-4: rgba(255, 255, 255, 0.42);
+  --bullet-color: rgba(120, 100, 80, 0.34);
+  --row-divider: rgba(120, 100, 80, 0.1);
+  --icon-filter: none;
+  --field-bg: rgba(255, 252, 246, 0.88);
+  --field-border: rgba(120, 100, 80, 0.16);
+  --field-placeholder: rgba(74, 66, 56, 0.42);
+  --field-focus-border: rgba(120, 100, 80, 0.3);
+  --field-focus-ring: rgba(200, 180, 150, 0.28);
+  --field-option-bg: #f8f4ec;
+  --done-accent: #7d8f62;
+  --done-accent-bright: #95a878;
+  --done-accent-muted: rgba(125, 143, 98, 0.62);
+  --done-border: rgba(125, 143, 98, 0.28);
+  --done-border-soft: rgba(125, 143, 98, 0.12);
+  --done-bg: rgba(240, 234, 222, 0.92);
+  --done-glow: 0 0 24px rgba(125, 143, 98, 0.08);
+}
+
+[data-theme="white"] {
+  --bg: #f5f5f5;
+  --text: #171717;
+  --text-muted: rgba(23, 23, 23, 0.56);
+  --color-scheme: light;
+  --theme-accent: #ffffff;
+  --theme-toggle-filter: brightness(0) saturate(100%);
+  --theme-accent-ring: rgba(23, 23, 23, 0.12);
+  --surface-sidebar: rgba(255, 255, 255, 0.9);
+  --surface-sidebar-border: rgba(23, 23, 23, 0.08);
+  --overlay-bg: rgba(23, 23, 23, 0.32);
+  --glass-border: rgba(23, 23, 23, 0.1);
+  --glass-border-bright: rgba(23, 23, 23, 0.16);
+  --glass-border-soft: rgba(23, 23, 23, 0.06);
+  --glass-bg-start: rgba(255, 255, 255, 0.96);
+  --glass-bg-mid: rgba(255, 255, 255, 0.88);
+  --glass-bg-end: rgba(245, 245, 245, 0.78);
+  --glass-shine: rgba(255, 255, 255, 0.9);
+  --glass-shine-mid: rgba(255, 255, 255, 0.35);
+  --glass-inset-top: rgba(255, 255, 255, 0.85);
+  --glass-inset-bottom: rgba(23, 23, 23, 0.04);
+  --glass-shadow: rgba(23, 23, 23, 0.08);
+  --glass-fallback: rgba(255, 255, 255, 0.98);
+  --glass-hover-start: rgba(255, 255, 255, 1);
+  --glass-hover-end: rgba(245, 245, 245, 0.92);
+  --glass-active-start: rgba(255, 255, 255, 1);
+  --glass-active-end: rgba(240, 240, 240, 0.96);
+  --ambient-1: rgba(200, 210, 230, 0.22);
+  --ambient-2: rgba(220, 220, 220, 0.28);
+  --ambient-3: rgba(180, 200, 220, 0.16);
+  --ambient-4: rgba(255, 255, 255, 0.55);
+  --bullet-color: rgba(23, 23, 23, 0.28);
+  --row-divider: rgba(23, 23, 23, 0.08);
+  --icon-filter: none;
+  --field-bg: rgba(255, 255, 255, 0.95);
+  --field-border: rgba(23, 23, 23, 0.12);
+  --field-placeholder: rgba(23, 23, 23, 0.38);
+  --field-focus-border: rgba(23, 23, 23, 0.24);
+  --field-focus-ring: rgba(23, 23, 23, 0.06);
+  --field-option-bg: #ffffff;
+  --done-accent: #22a06b;
+  --done-accent-bright: #2fbd7d;
+  --done-accent-muted: rgba(34, 160, 107, 0.58);
+  --done-border: rgba(34, 160, 107, 0.26);
+  --done-border-soft: rgba(34, 160, 107, 0.1);
+  --done-bg: rgba(255, 255, 255, 0.94);
+  --done-glow: 0 0 24px rgba(34, 160, 107, 0.08);
+}
+
+[data-theme="milk"],
+[data-theme="white"] {
+  --nav-done-color: var(--text);
+  --nav-done-color-hover: color-mix(in srgb, var(--done-accent) 55%, var(--text));
+  --nav-done-border: color-mix(in srgb, var(--done-accent) 34%, transparent);
+  --nav-done-bg: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--done-accent) 24%, white) 0%,
+    color-mix(in srgb, var(--done-accent) 12%, var(--surface-sidebar)) 100%
+  );
+  --nav-done-bg-hover: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--done-accent) 30%, white) 0%,
+    color-mix(in srgb, var(--done-accent) 16%, var(--surface-sidebar)) 100%
+  );
+  --nav-done-shine: linear-gradient(
+    115deg,
+    rgba(255, 255, 255, 0.55) 0%,
+    rgba(255, 255, 255, 0.12) 40%,
+    transparent 58%
+  );
+  --nav-done-icon-color: color-mix(in srgb, var(--done-accent) 70%, var(--text));
+}
+
+[data-theme="milk"] .nav-item--done.nav-item--active,
+[data-theme="white"] .nav-item--done.nav-item--active {
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.65),
+    0 0 0 1px color-mix(in srgb, var(--done-accent) 10%, transparent),
+    0 4px 14px color-mix(in srgb, var(--done-accent) 10%, transparent);
+}
+
+[data-theme="milk"] .icon-img--done,
+[data-theme="milk"] .icon-img--notes,
+[data-theme="milk"] .icon-img--projects,
+[data-theme="white"] .icon-img--done,
+[data-theme="white"] .icon-img--notes,
+[data-theme="white"] .icon-img--projects {
+  border-color: rgba(74, 66, 56, 0.35);
+}
+
+[data-theme="white"] .icon-img--done,
+[data-theme="white"] .icon-img--notes,
+[data-theme="white"] .icon-img--projects {
+  border-color: rgba(23, 23, 23, 0.28);
+}
+
+[data-theme="white"] {
+  --nav-done-icon-color: color-mix(in srgb, var(--done-accent) 80%, var(--text));
+}

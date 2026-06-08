@@ -6,6 +6,12 @@
       tag: "Идея",
       boardLabel: "Идеи",
       defaultSection: "new",
+      sections: [
+        { id: "new", label: "Новые" },
+        { id: "discuss", label: "Обсуждаются" },
+        { id: "discussed", label: "Обсудились" },
+        { id: "future", label: "В будущем" },
+      ],
       normalizeStatus: null,
     },
     {
@@ -14,6 +20,12 @@
       tag: "Разработка",
       boardLabel: "Разработка",
       defaultSection: "planned",
+      sections: [
+        { id: "planned", label: "Планируются" },
+        { id: "progress", label: "Делаются" },
+        { id: "postponed", label: "Отложены" },
+        { id: "waiting", label: "Ожидание" },
+      ],
       normalizeStatus: null,
     },
     {
@@ -22,6 +34,7 @@
       tag: "Срочно",
       boardLabel: "Срочно",
       defaultSection: "main",
+      sections: [{ id: "main", label: "Срочные задачи" }],
       normalizeStatus: function (status) {
         if (status === "bug" || status === "block") return "main";
         return status;
@@ -58,6 +71,13 @@
 
   const HOME_DONE_LIMIT = 3;
 
+  function getSectionLabel(board, status) {
+    const section = (board.sections || []).find(function (entry) {
+      return entry.id === status;
+    });
+    return section ? section.label : "";
+  }
+
   function collectDoneItems() {
     const done = [];
 
@@ -65,14 +85,21 @@
       loadBoardItems(board).forEach(function (item) {
         if (!item.completedAt) return;
 
+        let status = item.status || board.defaultSection;
+        if (board.normalizeStatus) {
+          status = board.normalizeStatus(status);
+        }
+
         done.push({
           id: item.id,
           title: item.title || "Без названия",
           completedAt: item.completedAt,
           updatedAt: item.updatedAt,
+          projectId: item.projectId,
           route: board.route,
-          tag: board.tag,
+          boardTag: board.tag,
           boardLabel: board.boardLabel,
+          sectionLabel: getSectionLabel(board, status),
         });
       });
     });
@@ -84,7 +111,25 @@
     return done;
   }
 
-  function renderDoneRow(item, listEl) {
+  function renderDoneRow(item, listEl, options) {
+    const opts = options || {};
+
+    if (opts.home && window.PronoteRenderHomeTaskRow) {
+      window.PronoteRenderHomeTaskRow(listEl, {
+        title: item.title,
+        boardTag: item.boardTag,
+        statusLabel: "Готово",
+        projectId: item.projectId,
+        isDone: true,
+        onTitleClick: function () {
+          if (window.PronoteEditItem && typeof window.PronoteEditItem.open === "function") {
+            window.PronoteEditItem.open(item.route, item.id);
+          }
+        },
+      });
+      return;
+    }
+
     const li = document.createElement("li");
     li.className = "today-list__row done-list__row";
 
@@ -104,6 +149,13 @@
     });
     titleCell.appendChild(a);
 
+    if (item.projectId && window.PronoteProjects) {
+      const badge = window.PronoteProjects.createBadgeElement(item.projectId);
+      if (badge) {
+        titleCell.appendChild(badge);
+      }
+    }
+
     if (item.updatedAt) {
       const modified = document.createElement("span");
       modified.className = "today-list__modified";
@@ -115,7 +167,7 @@
 
     const tag = document.createElement("span");
     tag.className = "today-list__tag";
-    tag.textContent = item.tag;
+    tag.textContent = item.boardTag || item.tag;
     li.appendChild(tag);
 
     const time = document.createElement("time");
@@ -145,7 +197,7 @@
     }
 
     items.forEach(function (item) {
-      renderDoneRow(item, listEl);
+      renderDoneRow(item, listEl, { home: true });
     });
 
     if (restCount > 0) {

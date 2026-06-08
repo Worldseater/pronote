@@ -4,10 +4,19 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Pronote</title>
+  <script>
+    (function () {
+      var theme = localStorage.getItem("pronote.theme.v1");
+      if (theme && theme !== "default") {
+        document.documentElement.setAttribute("data-theme", theme);
+      }
+    })();
+  </script>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="css/styles.css" />
+  <link rel="stylesheet" href="css/themes.css" />
 </head>
 <body>
   <div class="app">
@@ -15,7 +24,25 @@
 
     <aside class="sidebar" id="sidebar" aria-label="Навигация">
       <div class="sidebar__head">
-        <a href="#/" class="logo" data-route="home">Pronote</a>
+        <div class="sidebar__brand">
+          <a href="#/" class="logo" data-route="home">Pronote</a>
+          <button
+            type="button"
+            class="theme-toggle"
+            id="themeToggle"
+            aria-label="Сменить тему"
+            title="Сменить тему"
+          >
+            <img
+              src="svg/zap.svg"
+              alt=""
+              class="theme-toggle__icon"
+              width="20"
+              height="20"
+              aria-hidden="true"
+            />
+          </button>
+        </div>
         <button type="button" class="sidebar-close" id="sidebarClose" aria-label="Закрыть меню">
           <span aria-hidden="true"></span>
         </button>
@@ -82,6 +109,16 @@
           <span class="icon-img icon-img--done" aria-hidden="true">✓</span>
           <span>Готово</span>
         </a>
+
+        <a href="#/notes" class="nav-item" data-route="notes" id="navNotes">
+          <span class="icon-img icon-img--notes" aria-hidden="true"></span>
+          <span>Заметки</span>
+        </a>
+
+        <a href="#/projects" class="nav-item" data-route="projects" id="navProjects">
+          <span class="icon-img icon-img--projects" aria-hidden="true"></span>
+          <span>Проекты</span>
+        </a>
       </nav>
     </aside>
 
@@ -97,6 +134,50 @@
 
       <main class="main">
         <div class="view view--active" id="viewHome" data-view="home">
+        <section class="glass-bar glass-bar--notes" aria-label="Заметки">
+          <header class="notes-head">
+            <h2 class="glass-bar__label">Заметки</h2>
+            <button
+              type="button"
+              class="page-head__add glass notes-head__add"
+              id="homeNotesFormToggle"
+              aria-label="Добавить заметку"
+              aria-expanded="false"
+              aria-controls="homeNotesFormPanel"
+            >
+              <span class="page-head__add-icon" aria-hidden="true">+</span>
+            </button>
+          </header>
+
+          <section class="notes-form idea-form idea-form--inset glass-panel" id="homeNotesFormPanel" aria-labelledby="homeNotesFormTitle" hidden>
+            <div class="idea-form__head">
+              <h3 class="idea-form__title" id="homeNotesFormTitle">Новая заметка</h3>
+              <button type="button" class="idea-form__toggle glass" id="homeNotesFormClose" aria-controls="homeNotesFormBody">
+                Свернуть
+              </button>
+            </div>
+            <div class="idea-form__body" id="homeNotesFormBody">
+              <form id="homeNotesForm" novalidate>
+                <label class="field">
+                  <span class="field__label">Заголовок</span>
+                  <input class="field__input" type="text" name="title" required maxlength="200" placeholder="Кратко, о чём заметка" autocomplete="off" />
+                </label>
+                <label class="field">
+                  <span class="field__label">Текст</span>
+                  <textarea class="field__input field__input--area" name="text" rows="3" maxlength="4000" placeholder="Содержание заметки…"></textarea>
+                </label>
+                <p class="idea-form__error" id="homeNotesFormError" hidden></p>
+                <div class="idea-form__actions">
+                  <button type="submit" class="btn-primary glass">Сохранить</button>
+                  <button type="reset" class="btn-ghost">Очистить</button>
+                </div>
+              </form>
+            </div>
+          </section>
+
+          <ul class="notes-list today-list" id="homeNotesList" aria-label="Последние заметки"></ul>
+        </section>
+
         <section class="glass-bar glass-bar--today" aria-label="Сегодня">
           <header class="today-head">
             <h1 class="glass-bar__label">Сегодня</h1>
@@ -283,7 +364,7 @@
                       <span class="all-tasks-toolbar__label">Статус</span>
                       <select class="field__input field__input--select all-tasks-toolbar__select" id="allTasksStatusFilter">
                         <option value="all">Все статусы</option>
-                        <option value="active">Активные</option>
+                        <option value="active">Незавершённые</option>
                         <option value="done">Завершённые</option>
                       </select>
                     </label>
@@ -294,6 +375,126 @@
                 </div>
               </div>
             </section>
+          </div>
+        </div>
+
+        <div class="view" id="viewNotes" data-view="notes" hidden>
+          <div class="notes-page board-page">
+            <section class="ideas-section" id="notes-section-all">
+              <div class="ideas-block glass-panel">
+                <header class="ideas-block__head page-head">
+                  <div class="page-head__content">
+                    <p class="page-head__eyebrow">Записи</p>
+                    <h2 class="page-head__title">Заметки</h2>
+                    <p class="page-head__meta" id="notesPageMeta">Загрузка…</p>
+                  </div>
+                  <button
+                    type="button"
+                    class="page-head__add glass"
+                    id="notesPageFormToggle"
+                    aria-label="Добавить заметку"
+                    aria-expanded="false"
+                    aria-controls="notesPageFormPanel"
+                  >
+                    <span class="page-head__add-icon" aria-hidden="true">+</span>
+                  </button>
+                </header>
+
+                <section class="notes-form idea-form idea-form--inset" id="notesPageFormPanel" aria-labelledby="notesPageFormTitle" hidden>
+                  <div class="idea-form__head">
+                    <h3 class="idea-form__title" id="notesPageFormTitle">Новая заметка</h3>
+                    <button type="button" class="idea-form__toggle glass" id="notesPageFormClose" aria-controls="notesPageFormBody">
+                      Свернуть
+                    </button>
+                  </div>
+                  <div class="idea-form__body" id="notesPageFormBody">
+                    <form id="notesPageForm" novalidate>
+                      <label class="field">
+                        <span class="field__label">Заголовок</span>
+                        <input class="field__input" type="text" name="title" required maxlength="200" placeholder="Кратко, о чём заметка" autocomplete="off" />
+                      </label>
+                      <label class="field">
+                        <span class="field__label">Текст</span>
+                        <textarea class="field__input field__input--area" name="text" rows="4" maxlength="4000" placeholder="Содержание заметки…"></textarea>
+                      </label>
+                      <p class="idea-form__error" id="notesPageFormError" hidden></p>
+                      <div class="idea-form__actions">
+                        <button type="submit" class="btn-primary glass">Сохранить</button>
+                        <button type="reset" class="btn-ghost">Очистить</button>
+                      </div>
+                    </form>
+                  </div>
+                </section>
+
+                <div class="ideas-block__body">
+                  <ul class="notes-list today-list notes-page__list" id="notesPageList" aria-label="Все заметки"></ul>
+                </div>
+              </div>
+            </section>
+          </div>
+        </div>
+
+        <div class="view" id="viewProjects" data-view="projects" hidden>
+          <div class="projects-page board-page">
+            <section class="ideas-section" id="projects-section-create">
+              <div class="ideas-block glass-panel">
+                <header class="ideas-block__head page-head">
+                  <div class="page-head__content">
+                    <p class="page-head__eyebrow">Управление</p>
+                    <h2 class="page-head__title">Проекты</h2>
+                    <p class="page-head__meta" id="projectsPageMeta">Загрузка…</p>
+                  </div>
+                  <button
+                    type="button"
+                    class="page-head__add glass"
+                    id="projectCreateFormToggle"
+                    aria-label="Создать проект"
+                    aria-expanded="false"
+                    aria-controls="projectCreateFormPanel"
+                  >
+                    <span class="page-head__add-icon" aria-hidden="true">+</span>
+                  </button>
+                </header>
+
+                <section
+                  class="project-create-form idea-form idea-form--inset"
+                  id="projectCreateFormPanel"
+                  aria-labelledby="projectCreateFormTitle"
+                  hidden
+                >
+                  <div class="idea-form__head">
+                    <h3 class="idea-form__title" id="projectCreateFormTitle">Новый проект</h3>
+                    <button
+                      type="button"
+                      class="idea-form__toggle glass"
+                      id="projectCreateFormClose"
+                      aria-controls="projectCreateFormBody"
+                    >
+                      Свернуть
+                    </button>
+                  </div>
+                  <div class="idea-form__body" id="projectCreateFormBody">
+                    <form id="projectCreateForm" novalidate>
+                      <label class="field">
+                        <span class="field__label">Название проекта</span>
+                        <input class="field__input" type="text" name="name" required maxlength="80" placeholder="Например, Пропет" autocomplete="off" />
+                      </label>
+                      <div class="field">
+                        <span class="field__label">Цвет</span>
+                        <div class="project-picker__colors" id="projectCreateColors" role="radiogroup" aria-label="Цвет проекта"></div>
+                      </div>
+                      <p class="idea-form__error" id="projectCreateError" hidden></p>
+                      <div class="idea-form__actions">
+                        <button type="submit" class="btn-primary glass">Создать проект</button>
+                        <button type="reset" class="btn-ghost">Очистить</button>
+                      </div>
+                    </form>
+                  </div>
+                </section>
+              </div>
+            </section>
+
+            <div class="projects-page__list" id="projectsPageList"></div>
           </div>
         </div>
 
@@ -626,6 +827,36 @@
     </div>
   </div>
 
+  <div class="modal" id="noteEditModal" hidden>
+    <div class="modal__backdrop" id="noteEditModalBackdrop" aria-hidden="true"></div>
+    <div
+      class="modal__dialog modal__dialog--form glass-panel"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="noteEditModalTitle"
+    >
+      <h2 class="modal__title" id="noteEditModalTitle">Редактировать заметку</h2>
+      <form id="noteEditForm" class="edit-item-form" novalidate>
+        <label class="field">
+          <span class="field__label">Заголовок</span>
+          <input class="field__input" type="text" name="title" required maxlength="200" autocomplete="off" />
+        </label>
+        <label class="field">
+          <span class="field__label">Текст</span>
+          <textarea class="field__input field__input--area" name="text" rows="5" maxlength="4000"></textarea>
+        </label>
+        <p class="idea-form__error" id="noteEditFormError" hidden></p>
+        <div class="modal__actions modal__actions--split">
+          <button type="button" class="btn-danger glass" id="noteEditModalDelete">Удалить</button>
+          <div class="modal__actions-group">
+            <button type="button" class="btn-ghost" id="noteEditModalCancel">Отмена</button>
+            <button type="submit" class="btn-primary glass">Сохранить</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <div class="modal" id="confirmModal" hidden>
     <div class="modal__backdrop" id="confirmModalBackdrop" aria-hidden="true"></div>
     <div
@@ -644,11 +875,18 @@
     </div>
   </div>
 
+  <script src="js/themes.js"></script>
   <script src="js/confirm-modal.js"></script>
+  <script src="js/projects.js"></script>
+  <script src="js/note-board-picker.js"></script>
+  <script src="js/project-picker.js"></script>
   <script src="js/item-edit-modal.js"></script>
   <script src="js/board-page.js"></script>
+  <script src="js/home-task-row.js"></script>
   <script src="js/home-today.js"></script>
   <script src="js/done.js"></script>
+  <script src="js/notes.js"></script>
+  <script src="js/projects-page.js"></script>
   <script src="js/all-tasks.js"></script>
   <script src="js/ideas.js"></script>
   <script src="js/dev.js"></script>

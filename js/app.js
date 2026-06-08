@@ -44,6 +44,18 @@
       documentTitle: "Готово — Pronote",
       navRoute: "done",
     },
+    notes: {
+      viewId: "viewNotes",
+      title: "Заметки",
+      documentTitle: "Заметки — Pronote",
+      navRoute: "notes",
+    },
+    projects: {
+      viewId: "viewProjects",
+      title: "Проекты",
+      documentTitle: "Проекты — Pronote",
+      navRoute: "projects",
+    },
   };
 
   const hashToRoute = {
@@ -64,6 +76,8 @@
     "/urgent/block": "urgent",
     "/urgent/main": "urgent",
     "/done": "done",
+    "/notes": "notes",
+    "/projects": "projects",
     "/all": "all",
   };
 
@@ -85,6 +99,8 @@
     dev: "#/dev",
     urgent: "#/urgent",
     done: "#/done",
+    notes: "#/notes",
+    projects: "#/projects",
   };
 
   const sectionToHash = {
@@ -265,10 +281,19 @@
       if (window.renderHomeToday) window.renderHomeToday();
       if (window.renderHomeUrgentPreview) window.renderHomeUrgentPreview();
       if (window.renderHomeDone) window.renderHomeDone();
+      if (window.renderHomeNotes) window.renderHomeNotes();
     }
 
     if (routeName === "done" && window.renderDonePage) {
       window.renderDonePage();
+    }
+
+    if (routeName === "notes" && window.renderNotesPage) {
+      window.renderNotesPage();
+    }
+
+    if (routeName === "projects" && window.renderProjectsPage) {
+      window.renderProjectsPage();
     }
 
     if (routeName === "all" && window.renderAllTasksPage) {

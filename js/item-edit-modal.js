@@ -57,6 +57,9 @@
     if (typeof window.renderAllTasksPage === "function") {
       window.renderAllTasksPage();
     }
+    if (typeof window.renderProjectsPage === "function") {
+      window.renderProjectsPage();
+    }
   }
 
   function close() {
@@ -188,6 +191,10 @@
       text: fd.get("text"),
       comment: fd.get("comment"),
       status: sectionSelect ? sectionSelect.value : undefined,
+      projectId:
+        window.PronoteProjectPicker && typeof window.PronoteProjectPicker.resolve === "function"
+          ? window.PronoteProjectPicker.resolve(form)
+          : null,
     };
   }
 
@@ -232,6 +239,12 @@
 
     if (item.completedAt) {
       moved.completedAt = item.completedAt;
+    }
+
+    if (payload.projectId) {
+      moved.projectId = payload.projectId;
+    } else {
+      delete moved.projectId;
     }
 
     if (window.PronoteAppendComment) {
@@ -281,6 +294,12 @@
 
     fillBoardSelect(boardId);
     syncBoardFields(boardId, item);
+    if (
+      window.PronoteProjectPicker &&
+      typeof window.PronoteProjectPicker.setValue === "function"
+    ) {
+      window.PronoteProjectPicker.setValue(form, item.projectId || "");
+    }
     showError("");
 
     modal.hidden = false;
@@ -333,6 +352,13 @@
       const meta = getMeta(targetBoardId) || getMeta(activeBoardId);
       showError((meta && meta.titleError) || "Не удалось сохранить задачу.");
       return;
+    }
+
+    if (
+      window.PronoteProjectPicker &&
+      typeof window.PronoteProjectPicker.refreshAll === "function"
+    ) {
+      window.PronoteProjectPicker.refreshAll();
     }
 
     notifyHomeViews();

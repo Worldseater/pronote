@@ -202,6 +202,7 @@
           createdAt: item.createdAt,
           updatedAt: item.updatedAt,
           completedAt: item.completedAt,
+          projectId: item.projectId,
           route: board.route,
           tag: board.tag,
           boardLabel: board.boardLabel,
@@ -370,11 +371,11 @@
       });
       titleCell.appendChild(a);
 
-      if (item.sectionLabel) {
-        const section = document.createElement("span");
-        section.className = "all-tasks-list__section";
-        section.textContent = item.sectionLabel;
-        titleCell.appendChild(section);
+      if (item.projectId && window.PronoteProjects) {
+        const badge = window.PronoteProjects.createBadgeElement(item.projectId);
+        if (badge) {
+          titleCell.appendChild(badge);
+        }
       }
 
       if (item.updatedAt) {
@@ -394,7 +395,7 @@
       const status = document.createElement("span");
       status.className =
         "all-tasks-list__status" + (item.completedAt ? " all-tasks-list__status--done" : "");
-      status.textContent = item.completedAt ? "Готово" : "Активна";
+      status.textContent = item.completedAt ? "Готово" : item.sectionLabel || "—";
       li.appendChild(status);
 
       const displayDate = getDisplayDate(item, currentFilters.dateSort);
