@@ -50,6 +50,12 @@
       documentTitle: "Заметки — Pronote",
       navRoute: "notes",
     },
+    board: {
+      viewId: "viewCanvas",
+      title: "Доска",
+      documentTitle: "Доска — Pronote",
+      navRoute: "board",
+    },
     assignees: {
       viewId: "viewAssignees",
       title: "Ответственные",
@@ -83,6 +89,7 @@
     "/urgent/main": "urgent",
     "/done": "done",
     "/notes": "notes",
+    "/board": "board",
     "/assignees": "assignees",
     "/projects": "projects",
     "/all": "all",
@@ -107,6 +114,7 @@
     urgent: "#/urgent",
     done: "#/done",
     notes: "#/notes",
+    board: "#/board",
     assignees: "#/assignees",
     projects: "#/projects",
   };
@@ -298,6 +306,10 @@
 
     if (routeName === "notes" && window.renderNotesPage) {
       window.renderNotesPage();
+    }
+
+    if (routeName === "board" && window.renderCanvasPage) {
+      window.renderCanvasPage();
     }
 
     if (routeName === "assignees" && window.renderAssigneesPage) {

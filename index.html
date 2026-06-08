@@ -17,6 +17,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="css/styles.css" />
   <link rel="stylesheet" href="css/themes.css" />
+  <link rel="stylesheet" href="css/canvas-board.css" />
 </head>
 <body>
   <div class="app">
@@ -113,6 +114,11 @@
         <a href="#/notes" class="nav-item" data-route="notes" id="navNotes">
           <span class="icon-img icon-img--notes" aria-hidden="true"></span>
           <span>Заметки</span>
+        </a>
+
+        <a href="#/board" class="nav-item" data-route="board" id="navBoard">
+          <img src="svg/grid-svgrepo.svg" alt="" class="icon-img" width="20" height="20" />
+          <span>Доска</span>
         </a>
 
         <a href="#/assignees" class="nav-item" data-route="assignees" id="navAssignees">
@@ -436,6 +442,69 @@
                 </div>
               </div>
             </section>
+          </div>
+        </div>
+
+        <div class="view view--canvas" id="viewCanvas" data-view="board" hidden>
+          <div class="canvas-page" id="canvasPage">
+            <div class="canvas-chrome">
+              <header class="canvas-toolbar">
+                <div class="canvas-toolbar__boards">
+                  <select class="canvas-toolbar__select" id="canvasBoardSelect" aria-label="Выбор доски"></select>
+                  <button type="button" class="canvas-toolbar__icon-btn" id="canvasAddBoard" aria-label="Создать доску" title="Новая доска">+</button>
+                  <button type="button" class="canvas-toolbar__icon-btn" id="canvasDeleteBoard" aria-label="Удалить доску" title="Удалить доску">×</button>
+                </div>
+
+                <div class="canvas-toolbar__tools" role="toolbar" aria-label="Инструменты">
+                  <button type="button" class="canvas-tool-btn canvas-tool-btn--active" data-canvas-tool="cursor" aria-pressed="true">Курсор</button>
+                  <button type="button" class="canvas-tool-btn" data-canvas-tool="hand" aria-pressed="false">Рука</button>
+                  <button type="button" class="canvas-tool-btn" data-canvas-tool="card" aria-pressed="false">Карточка</button>
+                  <button type="button" class="canvas-tool-btn" data-canvas-tool="text" aria-pressed="false">Текст</button>
+                  <button type="button" class="canvas-tool-btn" data-canvas-tool="arrow" aria-pressed="false">Стрелка</button>
+                </div>
+
+                <div class="canvas-toolbar__zoom">
+                  <button type="button" class="canvas-toolbar__icon-btn" id="canvasZoomOut" aria-label="Отдалить">−</button>
+                  <span class="canvas-toolbar__zoom-label" id="canvasZoomLabel">100%</span>
+                  <button type="button" class="canvas-toolbar__icon-btn" id="canvasZoomIn" aria-label="Приблизить">+</button>
+                  <button type="button" class="canvas-tool-btn" id="canvasZoomReset">100%</button>
+                </div>
+              </header>
+
+              <div class="canvas-props-float" id="canvasPropsPanel" hidden>
+                <div class="canvas-props-float__inner">
+                  <div class="canvas-props-float__group">
+                    <span class="canvas-props-float__label">Фон</span>
+                    <div class="canvas-props-float__colors" id="canvasPropBgColors"></div>
+                  </div>
+                  <div class="canvas-props-float__group">
+                    <span class="canvas-props-float__label">Цвет</span>
+                    <div class="canvas-props-float__colors" id="canvasPropTextColors"></div>
+                  </div>
+                  <div class="canvas-props-float__group" id="canvasPropSizesGroup">
+                    <span class="canvas-props-float__label">Размер</span>
+                    <input
+                      type="number"
+                      class="canvas-props-float__size-input"
+                      id="canvasPropSizeInput"
+                      min="8"
+                      max="120"
+                      step="1"
+                      value="16"
+                      aria-label="Размер шрифта"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="canvas-viewport" id="canvasViewport">
+              <div class="canvas-world" id="canvasWorld">
+                <svg class="canvas-arrows" id="canvasArrows" aria-hidden="true"></svg>
+                <div class="canvas-items" id="canvasItems"></div>
+              </div>
+              <p class="canvas-hint" id="canvasHint" hidden></p>
+            </div>
           </div>
         </div>
 
@@ -960,6 +1029,9 @@
   <script src="js/notes.js"></script>
   <script src="js/projects-page.js"></script>
   <script src="js/assignees-page.js"></script>
+  <script src="js/canvas-boards.js"></script>
+  <script src="js/canvas-color-picker.js"></script>
+  <script src="js/canvas-page.js"></script>
   <script src="js/all-tasks.js"></script>
   <script src="js/ideas.js"></script>
   <script src="js/dev.js"></script>

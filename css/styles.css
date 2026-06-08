@@ -432,7 +432,7 @@ button {
   margin-top: 8px;
 }
 
-.nav-item[data-route="assignees"] {
+.nav-item[data-route="board"] {
   margin-top: auto;
   padding-top: 8px;
 }
