@@ -203,6 +203,7 @@
           updatedAt: item.updatedAt,
           completedAt: item.completedAt,
           projectId: item.projectId,
+          assigneeId: item.assigneeId,
           route: board.route,
           tag: board.tag,
           boardLabel: board.boardLabel,
@@ -373,6 +374,13 @@
 
       if (item.projectId && window.PronoteProjects) {
         const badge = window.PronoteProjects.createBadgeElement(item.projectId);
+        if (badge) {
+          titleCell.appendChild(badge);
+        }
+      }
+
+      if (item.assigneeId && window.PronoteAssignees) {
+        const badge = window.PronoteAssignees.createBadgeElement(item.assigneeId);
         if (badge) {
           titleCell.appendChild(badge);
         }

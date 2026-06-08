@@ -432,7 +432,7 @@ button {
   margin-top: 8px;
 }
 
-.nav-item[data-route="projects"] {
+.nav-item[data-route="assignees"] {
   margin-top: auto;
   padding-top: 8px;
 }
@@ -702,6 +702,10 @@ button {
 }
 
 .home-task-row__project {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 4px;
   justify-self: end;
   text-align: right;
   min-width: 0;
@@ -1779,12 +1783,13 @@ button {
 .project-picker__colors {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: 6px;
+  max-width: 360px;
 }
 
 .project-picker__color {
-  width: 28px;
-  height: 28px;
+  width: 24px;
+  height: 24px;
   padding: 0;
   border-radius: 50%;
   border: 2px solid rgba(255, 255, 255, 0.12);
@@ -1817,12 +1822,14 @@ button {
   white-space: nowrap;
 }
 
+.assignees-page__list,
 .projects-page__list {
   display: flex;
   flex-direction: column;
   gap: 20px;
 }
 
+.assignees-page__empty,
 .projects-page__empty {
   margin: 0;
   padding: 8px 0 4px;
@@ -1831,6 +1838,7 @@ button {
   text-align: center;
 }
 
+.assignees-block__head,
 .projects-block__head {
   position: relative;
   z-index: 1;
@@ -1846,6 +1854,7 @@ button {
     0 0 24px color-mix(in srgb, var(--project-color, #86efac) 8%, transparent);
 }
 
+.assignees-block__head::before,
 .projects-block__head::before {
   content: "";
   position: absolute;
@@ -1859,11 +1868,13 @@ button {
   pointer-events: none;
 }
 
+.assignees-block__head .page-head__content,
 .projects-block__head .page-head__content {
   position: relative;
   z-index: 1;
 }
 
+.assignees-block__delete,
 .projects-block__delete {
   position: relative;
   z-index: 1;
@@ -1872,40 +1883,122 @@ button {
   font-size: 13px;
 }
 
+.assignees-block__head .page-head__title,
 .projects-block__head .page-head__title {
   color: var(--project-color, var(--text));
 }
 
+.assignees-block__head .page-head__eyebrow,
+.assignees-block__head .page-head__meta,
 .projects-block__head .page-head__eyebrow,
 .projects-block__head .page-head__meta {
   color: color-mix(in srgb, var(--project-color, #86efac) 62%, var(--text-muted));
 }
 
+.assignees-page__tasks .home-task-row,
 .projects-page__tasks .home-task-row {
   align-items: center;
 }
 
+.assignees-block__drag-handle {
+  position: relative;
+  z-index: 1;
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  align-self: center;
+  width: 22px;
+  min-width: 22px;
+  height: 22px;
+  padding: 0;
+  margin: 0;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: color-mix(in srgb, var(--project-color, #86efac) 70%, var(--text-muted));
+  cursor: grab;
+  touch-action: none;
+  opacity: 0.72;
+  transition:
+    opacity var(--transition),
+    background var(--transition),
+    color var(--transition);
+}
+
+.assignees-block__drag-handle::before {
+  content: "";
+  display: block;
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: currentColor;
+  box-shadow:
+    5px 0 0 currentColor,
+    0 5px 0 currentColor,
+    5px 5px 0 currentColor,
+    0 10px 0 currentColor,
+    5px 10px 0 currentColor;
+}
+
+.assignees-block__drag-handle:hover {
+  opacity: 1;
+  background: color-mix(in srgb, var(--project-color, #86efac) 10%, transparent);
+}
+
+.assignees-block__drag-handle:active {
+  cursor: grabbing;
+}
+
+.assignees-page__section--dragging {
+  opacity: 0.45;
+}
+
+.assignees-page__section--drop-before {
+  box-shadow: inset 0 3px 0 var(--project-color, #86efac);
+}
+
+.assignees-page__section--drop-after {
+  box-shadow: inset 0 -3px 0 var(--project-color, #86efac);
+}
+
+.assignees-page__list--drop-end {
+  box-shadow: inset 0 -3px 0 rgba(255, 255, 255, 0.28);
+}
+
 .icon-img--projects {
   position: relative;
-  display: inline-block;
-  width: 16px;
-  height: 16px;
-  border: 1.5px solid rgba(255, 255, 255, 0.65);
-  border-radius: 3px;
+  flex-shrink: 0;
+  display: block;
+  width: 20px;
+  height: 20px;
   box-sizing: border-box;
 }
 
-.icon-img--projects::before {
+.icon-img--projects::before,
+.icon-img--projects::after {
   content: "";
   position: absolute;
-  top: -4px;
-  left: 2px;
-  width: 7px;
+  box-sizing: border-box;
+  border: 1.5px solid rgba(255, 255, 255, 0.72);
+}
+
+.icon-img--projects::after {
+  left: 3px;
+  right: 3px;
+  bottom: 3px;
+  height: 10px;
+  border-radius: 2px;
+}
+
+.icon-img--projects::before {
+  top: 5px;
+  left: 50%;
+  width: 8px;
   height: 4px;
-  border: 1.5px solid rgba(255, 255, 255, 0.65);
+  margin-left: -4px;
   border-bottom: none;
   border-radius: 2px 2px 0 0;
-  box-sizing: border-box;
 }
 
 .idea-card__foot {

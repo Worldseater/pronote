@@ -230,16 +230,19 @@
 
 [data-theme="milk"] .icon-img--done,
 [data-theme="milk"] .icon-img--notes,
-[data-theme="milk"] .icon-img--projects,
+[data-theme="milk"] .icon-img--projects::before,
+[data-theme="milk"] .icon-img--projects::after,
 [data-theme="white"] .icon-img--done,
 [data-theme="white"] .icon-img--notes,
-[data-theme="white"] .icon-img--projects {
+[data-theme="white"] .icon-img--projects::before,
+[data-theme="white"] .icon-img--projects::after {
   border-color: rgba(74, 66, 56, 0.35);
 }
 
 [data-theme="white"] .icon-img--done,
 [data-theme="white"] .icon-img--notes,
-[data-theme="white"] .icon-img--projects {
+[data-theme="white"] .icon-img--projects::before,
+[data-theme="white"] .icon-img--projects::after {
   border-color: rgba(23, 23, 23, 0.28);
 }
 

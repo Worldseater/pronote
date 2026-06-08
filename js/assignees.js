@@ -1,5 +1,5 @@
 (function () {
-  const STORAGE_KEY = "pronote.projects.v1";
+  const STORAGE_KEY = "pronote.assignees.v1";
   const TASK_STORAGE_KEYS = [
     "pronote.ideas.v1",
     "pronote.dev.v1",
@@ -16,7 +16,7 @@
     if (typeof crypto !== "undefined" && crypto.randomUUID) {
       return crypto.randomUUID();
     }
-    return "project-" + Date.now() + "-" + Math.random().toString(16).slice(2, 8);
+    return "assignee-" + Date.now() + "-" + Math.random().toString(16).slice(2, 8);
   }
 
   function normalizeName(name) {
@@ -25,42 +25,42 @@
       .replace(/\s+/g, " ");
   }
 
-  function loadProjects() {
+  function loadAssignees() {
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
       if (!raw) return [];
       const parsed = JSON.parse(raw);
       if (!Array.isArray(parsed)) return [];
       return parsed
-        .filter(function (project) {
-          return project && normalizeName(project.name);
+        .filter(function (assignee) {
+          return assignee && normalizeName(assignee.name);
         })
-        .map(function (project) {
+        .map(function (assignee) {
           return {
-            id: project.id || createId(),
-            name: normalizeName(project.name),
-            color: project.color || DEFAULT_COLORS[0],
+            id: assignee.id || createId(),
+            name: normalizeName(assignee.name),
+            color: assignee.color || DEFAULT_COLORS[0],
           };
         });
     } catch (err) {
-      console.warn("Pronote: чтение проектов", err);
+      console.warn("Pronote: чтение ответственных", err);
       return [];
     }
   }
 
-  function saveProjects(projects) {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(projects));
+  function saveAssignees(assignees) {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(assignees));
   }
 
   function getAll() {
-    return loadProjects();
+    return loadAssignees();
   }
 
   function getById(id) {
     if (!id) return null;
     return (
-      loadProjects().find(function (project) {
-        return project.id === id;
+      loadAssignees().find(function (assignee) {
+        return assignee.id === id;
       }) || null
     );
   }
@@ -69,8 +69,8 @@
     const normalized = normalizeName(name).toLowerCase();
     if (!normalized) return null;
     return (
-      loadProjects().find(function (project) {
-        return normalizeName(project.name).toLowerCase() === normalized;
+      loadAssignees().find(function (assignee) {
+        return normalizeName(assignee.name).toLowerCase() === normalized;
       }) || null
     );
   }
@@ -85,7 +85,7 @@
     return DEFAULT_COLORS[0];
   }
 
-  function clearProjectFromTasks(projectId) {
+  function clearAssigneeFromTasks(assigneeId) {
     TASK_STORAGE_KEYS.forEach(function (storageKey) {
       try {
         const raw = localStorage.getItem(storageKey);
@@ -95,9 +95,9 @@
 
         let changed = false;
         const next = parsed.map(function (item) {
-          if (!item || item.projectId !== projectId) return item;
+          if (!item || item.assigneeId !== assigneeId) return item;
           const copy = Object.assign({}, item);
-          delete copy.projectId;
+          delete copy.assigneeId;
           changed = true;
           return copy;
         });
@@ -106,32 +106,66 @@
           localStorage.setItem(storageKey, JSON.stringify(next));
         }
       } catch (err) {
-        console.warn("Pronote: сброс проекта в задачах", storageKey, err);
+        console.warn("Pronote: сброс ответственного в задачах", storageKey, err);
       }
     });
   }
 
-  function deleteProject(id) {
+  function deleteAssignee(id) {
     if (!id) {
       return { ok: false, error: "id" };
     }
 
-    const projects = loadProjects();
-    const index = projects.findIndex(function (project) {
-      return project.id === id;
+    const assignees = loadAssignees();
+    const index = assignees.findIndex(function (assignee) {
+      return assignee.id === id;
     });
 
     if (index === -1) {
       return { ok: false, error: "not_found" };
     }
 
-    projects.splice(index, 1);
-    saveProjects(projects);
-    clearProjectFromTasks(id);
+    assignees.splice(index, 1);
+    saveAssignees(assignees);
+    clearAssigneeFromTasks(id);
     return { ok: true };
   }
 
-  function createProject(data) {
+  function reorderAssignees(orderedIds) {
+    if (!Array.isArray(orderedIds) || orderedIds.length === 0) {
+      return { ok: false, error: "ids" };
+    }
+
+    const assignees = loadAssignees();
+    const byId = {};
+    assignees.forEach(function (assignee) {
+      byId[assignee.id] = assignee;
+    });
+
+    const reordered = [];
+    const seen = {};
+
+    orderedIds.forEach(function (id) {
+      if (!id || seen[id] || !byId[id]) return;
+      seen[id] = true;
+      reordered.push(byId[id]);
+    });
+
+    assignees.forEach(function (assignee) {
+      if (!seen[assignee.id]) {
+        reordered.push(assignee);
+      }
+    });
+
+    if (reordered.length !== assignees.length) {
+      return { ok: false, error: "mismatch" };
+    }
+
+    saveAssignees(reordered);
+    return { ok: true };
+  }
+
+  function createAssignee(data) {
     const name = normalizeName(data && data.name);
     if (!name) {
       return { ok: false, error: "name" };
@@ -141,15 +175,15 @@
       return { ok: false, error: "duplicate" };
     }
 
-    const project = {
+    const assignee = {
       id: createId(),
       name: name,
       color: pickColor(data && data.color),
     };
-    const projects = loadProjects();
-    projects.push(project);
-    saveProjects(projects);
-    return { ok: true, project: project };
+    const assignees = loadAssignees();
+    assignees.push(assignee);
+    saveAssignees(assignees);
+    return { ok: true, assignee: assignee };
   }
 
   function escapeHtml(str) {
@@ -160,36 +194,37 @@
       .replace(/"/g, "&quot;");
   }
 
-  function renderBadgeHtml(projectId) {
-    const project = getById(projectId);
-    if (!project) return "";
+  function renderBadgeHtml(assigneeId) {
+    const assignee = getById(assigneeId);
+    if (!assignee) return "";
     return (
       '<span class="project-badge" style="--project-color:' +
-      escapeHtml(project.color) +
+      escapeHtml(assignee.color) +
       '">' +
-      escapeHtml(project.name) +
+      escapeHtml(assignee.name) +
       "</span>"
     );
   }
 
-  function createBadgeElement(projectId) {
-    const project = getById(projectId);
-    if (!project) return null;
+  function createBadgeElement(assigneeId) {
+    const assignee = getById(assigneeId);
+    if (!assignee) return null;
     const span = document.createElement("span");
     span.className = "project-badge";
-    span.style.setProperty("--project-color", project.color);
-    span.textContent = project.name;
+    span.style.setProperty("--project-color", assignee.color);
+    span.textContent = assignee.name;
     return span;
   }
 
-  window.PronoteProjects = {
+  window.PronoteAssignees = {
     STORAGE_KEY: STORAGE_KEY,
     DEFAULT_COLORS: DEFAULT_COLORS,
     getAll: getAll,
     getById: getById,
     findByName: findByName,
-    createProject: createProject,
-    deleteProject: deleteProject,
+    createAssignee: createAssignee,
+    reorderAssignees: reorderAssignees,
+    deleteAssignee: deleteAssignee,
     pickColor: pickColor,
     renderBadgeHtml: renderBadgeHtml,
     createBadgeElement: createBadgeElement,

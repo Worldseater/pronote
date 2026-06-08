@@ -133,6 +133,16 @@
     return null;
   }
 
+  function resolveAssigneeId(form) {
+    if (
+      window.PronoteAssigneePicker &&
+      typeof window.PronoteAssigneePicker.resolve === "function"
+    ) {
+      return window.PronoteAssigneePicker.resolve(form);
+    }
+    return null;
+  }
+
   function resolveBoardLink(form) {
     if (
       window.PronoteNoteBoardPicker &&
@@ -166,6 +176,12 @@
     ) {
       window.PronoteProjectPicker.reset(form);
     }
+    if (
+      window.PronoteAssigneePicker &&
+      typeof window.PronoteAssigneePicker.reset === "function"
+    ) {
+      window.PronoteAssigneePicker.reset(form);
+    }
   }
 
   function addNote(data) {
@@ -181,6 +197,9 @@
 
     if (data.projectId) {
       note.projectId = data.projectId;
+    }
+    if (data.assigneeId) {
+      note.assigneeId = data.assigneeId;
     }
     applyBoardLink(note, data.boardLink);
 
@@ -210,6 +229,11 @@
       updated.projectId = data.projectId;
     } else {
       delete updated.projectId;
+    }
+    if (data.assigneeId) {
+      updated.assigneeId = data.assigneeId;
+    } else {
+      delete updated.assigneeId;
     }
     applyBoardLink(updated, data.boardLink);
 
@@ -366,6 +390,7 @@
           title: title,
           text: String(fd.get("text") || ""),
           projectId: resolveProjectId(form),
+          assigneeId: resolveAssigneeId(form),
           boardLink: resolveBoardLink(form),
         })
       ) {
@@ -420,6 +445,12 @@
       typeof window.PronoteProjectPicker.setValue === "function"
     ) {
       window.PronoteProjectPicker.setValue(editForm, note.projectId || "");
+    }
+    if (
+      window.PronoteAssigneePicker &&
+      typeof window.PronoteAssigneePicker.setValue === "function"
+    ) {
+      window.PronoteAssigneePicker.setValue(editForm, note.assigneeId || "");
     }
     showFormError(editFormError, "");
 
@@ -499,6 +530,7 @@
           title: title,
           text: String(fd.get("text") || ""),
           projectId: resolveProjectId(editForm),
+          assigneeId: resolveAssigneeId(editForm),
           boardLink: resolveBoardLink(editForm),
         })
       ) {

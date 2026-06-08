@@ -13,12 +13,19 @@
     return datePart + ", " + timePart;
   }
 
-  function renderProjectCell(projectId) {
+  function renderTagsCell(projectId, assigneeId) {
     const cell = document.createElement("span");
     cell.className = "home-task-row__project";
 
     if (projectId && window.PronoteProjects) {
       const badge = window.PronoteProjects.createBadgeElement(projectId);
+      if (badge) {
+        cell.appendChild(badge);
+      }
+    }
+
+    if (assigneeId && window.PronoteAssignees) {
+      const badge = window.PronoteAssignees.createBadgeElement(assigneeId);
       if (badge) {
         cell.appendChild(badge);
       }
@@ -61,7 +68,7 @@
     }
 
     if (!item.hideProject) {
-      li.appendChild(renderProjectCell(item.projectId));
+      li.appendChild(renderTagsCell(item.projectId, item.assigneeId));
     }
 
     listEl.appendChild(li);

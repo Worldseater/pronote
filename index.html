@@ -115,6 +115,11 @@
           <span>Заметки</span>
         </a>
 
+        <a href="#/assignees" class="nav-item" data-route="assignees" id="navAssignees">
+          <img src="svg/user.svg" alt="" class="icon-img" width="20" height="20" />
+          <span>Ответственные</span>
+        </a>
+
         <a href="#/projects" class="nav-item" data-route="projects" id="navProjects">
           <span class="icon-img icon-img--projects" aria-hidden="true"></span>
           <span>Проекты</span>
@@ -431,6 +436,70 @@
                 </div>
               </div>
             </section>
+          </div>
+        </div>
+
+        <div class="view" id="viewAssignees" data-view="assignees" hidden>
+          <div class="assignees-page board-page">
+            <section class="ideas-section" id="assignees-section-create">
+              <div class="ideas-block glass-panel">
+                <header class="ideas-block__head page-head">
+                  <div class="page-head__content">
+                    <p class="page-head__eyebrow">Управление</p>
+                    <h2 class="page-head__title">Ответственные</h2>
+                    <p class="page-head__meta" id="assigneesPageMeta">Загрузка…</p>
+                  </div>
+                  <button
+                    type="button"
+                    class="page-head__add glass"
+                    id="assigneeCreateFormToggle"
+                    aria-label="Создать ответственного"
+                    aria-expanded="false"
+                    aria-controls="assigneeCreateFormPanel"
+                  >
+                    <span class="page-head__add-icon" aria-hidden="true">+</span>
+                  </button>
+                </header>
+
+                <section
+                  class="assignee-create-form idea-form idea-form--inset"
+                  id="assigneeCreateFormPanel"
+                  aria-labelledby="assigneeCreateFormTitle"
+                  hidden
+                >
+                  <div class="idea-form__head">
+                    <h3 class="idea-form__title" id="assigneeCreateFormTitle">Новый ответственный</h3>
+                    <button
+                      type="button"
+                      class="idea-form__toggle glass"
+                      id="assigneeCreateFormClose"
+                      aria-controls="assigneeCreateFormBody"
+                    >
+                      Свернуть
+                    </button>
+                  </div>
+                  <div class="idea-form__body" id="assigneeCreateFormBody">
+                    <form id="assigneeCreateForm" novalidate>
+                      <label class="field">
+                        <span class="field__label">Имя</span>
+                        <input class="field__input" type="text" name="name" required maxlength="80" placeholder="Например, Алексей" autocomplete="off" />
+                      </label>
+                      <div class="field">
+                        <span class="field__label">Цвет</span>
+                        <div class="project-picker__colors" id="assigneeCreateColors" role="radiogroup" aria-label="Цвет ответственного"></div>
+                      </div>
+                      <p class="idea-form__error" id="assigneeCreateError" hidden></p>
+                      <div class="idea-form__actions">
+                        <button type="submit" class="btn-primary glass">Создать</button>
+                        <button type="reset" class="btn-ghost">Очистить</button>
+                      </div>
+                    </form>
+                  </div>
+                </section>
+              </div>
+            </section>
+
+            <div class="assignees-page__list" id="assigneesPageList"></div>
           </div>
         </div>
 
@@ -877,9 +946,12 @@
 
   <script src="js/themes.js"></script>
   <script src="js/confirm-modal.js"></script>
+  <script src="js/color-palette.js"></script>
   <script src="js/projects.js"></script>
+  <script src="js/assignees.js"></script>
   <script src="js/note-board-picker.js"></script>
   <script src="js/project-picker.js"></script>
+  <script src="js/assignee-picker.js"></script>
   <script src="js/item-edit-modal.js"></script>
   <script src="js/board-page.js"></script>
   <script src="js/home-task-row.js"></script>
@@ -887,6 +959,7 @@
   <script src="js/done.js"></script>
   <script src="js/notes.js"></script>
   <script src="js/projects-page.js"></script>
+  <script src="js/assignees-page.js"></script>
   <script src="js/all-tasks.js"></script>
   <script src="js/ideas.js"></script>
   <script src="js/dev.js"></script>

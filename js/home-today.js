@@ -139,6 +139,7 @@
           createdAt: item.createdAt,
           updatedAt: item.updatedAt,
           projectId: item.projectId,
+          assigneeId: item.assigneeId,
           route: board.route,
           section: status,
           href: getItemHash(board, item),
@@ -177,6 +178,7 @@
           boardTag: item.boardTag,
           statusLabel: item.statusLabel,
           projectId: item.projectId,
+          assigneeId: item.assigneeId,
           onTitleClick: function () {
             if (window.PronoteEditItem && typeof window.PronoteEditItem.open === "function") {
               window.PronoteEditItem.open(item.route, item.id);
@@ -310,6 +312,10 @@
         window.PronoteProjectPicker && typeof window.PronoteProjectPicker.resolve === "function"
           ? window.PronoteProjectPicker.resolve(form)
           : null,
+      assigneeId:
+        window.PronoteAssigneePicker && typeof window.PronoteAssigneePicker.resolve === "function"
+          ? window.PronoteAssigneePicker.resolve(form)
+          : null,
     });
 
     if (!ok) {
@@ -323,6 +329,12 @@
     ) {
       window.PronoteProjectPicker.refreshAll();
     }
+    if (
+      window.PronoteAssigneePicker &&
+      typeof window.PronoteAssigneePicker.refreshAll === "function"
+    ) {
+      window.PronoteAssigneePicker.refreshAll();
+    }
 
     if (boardRoute === "urgent" && typeof window.renderHomeUrgentPreview === "function") {
       window.renderHomeUrgentPreview();
@@ -331,6 +343,9 @@
     form.reset();
     if (window.PronoteProjectPicker && typeof window.PronoteProjectPicker.reset === "function") {
       window.PronoteProjectPicker.reset(form);
+    }
+    if (window.PronoteAssigneePicker && typeof window.PronoteAssigneePicker.reset === "function") {
+      window.PronoteAssigneePicker.reset(form);
     }
     handleBoardChange();
     showFormError("");
@@ -355,6 +370,12 @@
           typeof window.PronoteProjectPicker.reset === "function"
         ) {
           window.PronoteProjectPicker.reset(form);
+        }
+        if (
+          window.PronoteAssigneePicker &&
+          typeof window.PronoteAssigneePicker.reset === "function"
+        ) {
+          window.PronoteAssigneePicker.reset(form);
         }
         handleBoardChange();
         showFormError("");

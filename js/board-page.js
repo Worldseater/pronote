@@ -229,16 +229,23 @@
         item.projectId && window.PronoteProjects
           ? window.PronoteProjects.renderBadgeHtml(item.projectId)
           : "";
-      if (projectBadge || tag || dateStr) {
+      const assigneeBadge =
+        item.assigneeId && window.PronoteAssignees
+          ? window.PronoteAssignees.renderBadgeHtml(item.assigneeId)
+          : "";
+      if (projectBadge || assigneeBadge || tag || dateStr) {
         html += '<footer class="idea-card__foot">';
         html += '<div class="idea-card__foot-left">';
         if (projectBadge) {
           html += projectBadge;
         }
+        if (assigneeBadge) {
+          html += assigneeBadge;
+        }
         if (tag) {
           html += '<span class="idea-card__tag">' + escapeHtml(tag) + "</span>";
         }
-        if (!projectBadge && !tag) {
+        if (!projectBadge && !assigneeBadge && !tag) {
           html += "<span></span>";
         }
         html += "</div>";
@@ -395,6 +402,10 @@
         item.projectId = data.projectId;
       }
 
+      if (data.assigneeId) {
+        item.assigneeId = data.assigneeId;
+      }
+
       const items = loadItems();
       items.unshift(item);
       saveItems(items);
@@ -480,6 +491,12 @@
         delete updated.projectId;
       }
 
+      if (data.assigneeId) {
+        updated.assigneeId = data.assigneeId;
+      } else {
+        delete updated.assigneeId;
+      }
+
       items[index] = updated;
       saveItems(items);
       render();
@@ -538,6 +555,10 @@
             window.PronoteProjectPicker && typeof window.PronoteProjectPicker.resolve === "function"
               ? window.PronoteProjectPicker.resolve(form)
               : null,
+          assigneeId:
+            window.PronoteAssigneePicker && typeof window.PronoteAssigneePicker.resolve === "function"
+              ? window.PronoteAssigneePicker.resolve(form)
+              : null,
         };
         if (addItem(payload)) {
           form.reset();
@@ -548,10 +569,22 @@
             window.PronoteProjectPicker.reset(form);
           }
           if (
+            window.PronoteAssigneePicker &&
+            typeof window.PronoteAssigneePicker.reset === "function"
+          ) {
+            window.PronoteAssigneePicker.reset(form);
+          }
+          if (
             window.PronoteProjectPicker &&
             typeof window.PronoteProjectPicker.refreshAll === "function"
           ) {
             window.PronoteProjectPicker.refreshAll();
+          }
+          if (
+            window.PronoteAssigneePicker &&
+            typeof window.PronoteAssigneePicker.refreshAll === "function"
+          ) {
+            window.PronoteAssigneePicker.refreshAll();
           }
           closeFormPanel();
         }

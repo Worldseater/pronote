@@ -50,6 +50,12 @@
       documentTitle: "Заметки — Pronote",
       navRoute: "notes",
     },
+    assignees: {
+      viewId: "viewAssignees",
+      title: "Ответственные",
+      documentTitle: "Ответственные — Pronote",
+      navRoute: "assignees",
+    },
     projects: {
       viewId: "viewProjects",
       title: "Проекты",
@@ -77,6 +83,7 @@
     "/urgent/main": "urgent",
     "/done": "done",
     "/notes": "notes",
+    "/assignees": "assignees",
     "/projects": "projects",
     "/all": "all",
   };
@@ -100,6 +107,7 @@
     urgent: "#/urgent",
     done: "#/done",
     notes: "#/notes",
+    assignees: "#/assignees",
     projects: "#/projects",
   };
 
@@ -290,6 +298,10 @@
 
     if (routeName === "notes" && window.renderNotesPage) {
       window.renderNotesPage();
+    }
+
+    if (routeName === "assignees" && window.renderAssigneesPage) {
+      window.renderAssigneesPage();
     }
 
     if (routeName === "projects" && window.renderProjectsPage) {

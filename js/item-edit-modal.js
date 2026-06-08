@@ -195,6 +195,10 @@
         window.PronoteProjectPicker && typeof window.PronoteProjectPicker.resolve === "function"
           ? window.PronoteProjectPicker.resolve(form)
           : null,
+      assigneeId:
+        window.PronoteAssigneePicker && typeof window.PronoteAssigneePicker.resolve === "function"
+          ? window.PronoteAssigneePicker.resolve(form)
+          : null,
     };
   }
 
@@ -245,6 +249,12 @@
       moved.projectId = payload.projectId;
     } else {
       delete moved.projectId;
+    }
+
+    if (payload.assigneeId) {
+      moved.assigneeId = payload.assigneeId;
+    } else {
+      delete moved.assigneeId;
     }
 
     if (window.PronoteAppendComment) {
@@ -299,6 +309,12 @@
       typeof window.PronoteProjectPicker.setValue === "function"
     ) {
       window.PronoteProjectPicker.setValue(form, item.projectId || "");
+    }
+    if (
+      window.PronoteAssigneePicker &&
+      typeof window.PronoteAssigneePicker.setValue === "function"
+    ) {
+      window.PronoteAssigneePicker.setValue(form, item.assigneeId || "");
     }
     showError("");
 
@@ -359,6 +375,12 @@
       typeof window.PronoteProjectPicker.refreshAll === "function"
     ) {
       window.PronoteProjectPicker.refreshAll();
+    }
+    if (
+      window.PronoteAssigneePicker &&
+      typeof window.PronoteAssigneePicker.refreshAll === "function"
+    ) {
+      window.PronoteAssigneePicker.refreshAll();
     }
 
     notifyHomeViews();

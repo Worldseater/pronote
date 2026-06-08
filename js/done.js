@@ -96,6 +96,7 @@
           completedAt: item.completedAt,
           updatedAt: item.updatedAt,
           projectId: item.projectId,
+          assigneeId: item.assigneeId,
           route: board.route,
           boardTag: board.tag,
           boardLabel: board.boardLabel,
@@ -120,6 +121,7 @@
         boardTag: item.boardTag,
         statusLabel: "Готово",
         projectId: item.projectId,
+        assigneeId: item.assigneeId,
         isDone: true,
         onTitleClick: function () {
           if (window.PronoteEditItem && typeof window.PronoteEditItem.open === "function") {
@@ -151,6 +153,13 @@
 
     if (item.projectId && window.PronoteProjects) {
       const badge = window.PronoteProjects.createBadgeElement(item.projectId);
+      if (badge) {
+        titleCell.appendChild(badge);
+      }
+    }
+
+    if (item.assigneeId && window.PronoteAssignees) {
+      const badge = window.PronoteAssignees.createBadgeElement(item.assigneeId);
       if (badge) {
         titleCell.appendChild(badge);
       }
