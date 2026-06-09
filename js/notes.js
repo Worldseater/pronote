@@ -1,14 +1,5 @@
 (function () {
   const STORAGE_KEY = "pronote.notes.v1";
-  const HOME_NOTES_LIMIT = 3;
-
-  const homeListEl = document.getElementById("homeNotesList");
-  const homeForm = document.getElementById("homeNotesForm");
-  const homeFormPanel = document.getElementById("homeNotesFormPanel");
-  const homeFormToggle = document.getElementById("homeNotesFormToggle");
-  const homeFormClose = document.getElementById("homeNotesFormClose");
-  const homeFormError = document.getElementById("homeNotesFormError");
-
   const pageListEl = document.getElementById("notesPageList");
   const pageMetaEl = document.getElementById("notesPageMeta");
   const pageForm = document.getElementById("notesPageForm");
@@ -23,6 +14,7 @@
   const editFormError = document.getElementById("noteEditFormError");
   const editCancelBtn = document.getElementById("noteEditModalCancel");
   const editDeleteBtn = document.getElementById("noteEditModalDelete");
+  const editConvertBtn = document.getElementById("noteEditModalConvert");
 
   let activeNoteId = null;
   let lastFocus = null;
@@ -242,6 +234,169 @@
     return true;
   }
 
+  function createTaskId() {
+    if (typeof crypto !== "undefined" && crypto.randomUUID) {
+      return crypto.randomUUID();
+    }
+    return "task-" + Date.now() + "-" + Math.random().toString(16).slice(2, 8);
+  }
+
+  function resolveTargetBoard(form, note) {
+    const boardLink = resolveBoardLink(form);
+    if (boardLink && boardLink.boardRoute) {
+      return boardLink;
+    }
+    if (note.boardRoute && note.section) {
+      return {
+        boardRoute: note.boardRoute,
+        section: note.section,
+      };
+    }
+    return {
+      boardRoute: "ideas",
+      section: "new",
+    };
+  }
+
+  function getBoardTargetLabel(boardRoute, section) {
+    const boardLabel =
+      window.PronoteNoteBoardPicker &&
+      typeof window.PronoteNoteBoardPicker.getBoardLabel === "function"
+        ? window.PronoteNoteBoardPicker.getBoardLabel(boardRoute)
+        : boardRoute;
+    const sectionLabel =
+      window.PronoteNoteBoardPicker &&
+      typeof window.PronoteNoteBoardPicker.getSectionLabel === "function"
+        ? window.PronoteNoteBoardPicker.getSectionLabel(boardRoute, section)
+        : section;
+    return boardLabel + " → " + sectionLabel;
+  }
+
+  function notifyTaskViews() {
+    if (typeof window.renderHomeToday === "function") {
+      window.renderHomeToday();
+    }
+    if (typeof window.renderHomeDone === "function") {
+      window.renderHomeDone();
+    }
+    if (typeof window.renderHomeUrgentPreview === "function") {
+      window.renderHomeUrgentPreview();
+    }
+    if (typeof window.renderAllTasksPage === "function") {
+      window.renderAllTasksPage();
+    }
+    if (typeof window.renderProjectsPage === "function") {
+      window.renderProjectsPage();
+    }
+    if (typeof window.renderDonePage === "function") {
+      window.renderDonePage();
+    }
+  }
+
+  function readEditFormData() {
+    if (!editForm) {
+      return {
+        title: "",
+        text: "",
+        projectId: null,
+        assigneeId: null,
+        form: null,
+      };
+    }
+
+    const fd = new FormData(editForm);
+    return {
+      title: String(fd.get("title") || ""),
+      text: String(fd.get("text") || ""),
+      projectId: resolveProjectId(editForm),
+      assigneeId: resolveAssigneeId(editForm),
+      form: editForm,
+    };
+  }
+
+  function convertNoteToTask(noteId, formData) {
+    const note = getNoteById(noteId);
+    if (!note) {
+      return { ok: false, error: "Заметка не найдена." };
+    }
+
+    const title = (formData.title || "").trim();
+    if (!title) {
+      return { ok: false, error: "Введите заголовок заметки." };
+    }
+
+    const target = resolveTargetBoard(formData.form, note);
+    const boardId = target.boardRoute;
+    const handler =
+      window.PronoteBoardHandlers && window.PronoteBoardHandlers[boardId];
+    const meta = window.PronoteBoardMeta && window.PronoteBoardMeta[boardId];
+
+    if (!handler || typeof handler.insertItem !== "function") {
+      return { ok: false, error: "Не удалось создать задачу." };
+    }
+
+    const statuses = (meta && meta.sections ? meta.sections : []).map(function (section) {
+      return section.id;
+    });
+    const status =
+      target.section && statuses.indexOf(target.section) !== -1
+        ? target.section
+        : (meta && meta.defaultSection) || statuses[0];
+
+    const task = {
+      id: createTaskId(),
+      title: title,
+      text: (formData.text || "").trim(),
+      status: status,
+      createdAt: note.createdAt || new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      comments: [],
+    };
+
+    if (formData.projectId) {
+      task.projectId = formData.projectId;
+    }
+    if (formData.assigneeId) {
+      task.assigneeId = formData.assigneeId;
+    }
+
+    if (!handler.insertItem(task)) {
+      return { ok: false, error: "Не удалось создать задачу." };
+    }
+
+    deleteNote(noteId);
+    notifyTaskViews();
+    refreshViews();
+
+    return {
+      ok: true,
+      boardId: boardId,
+      section: status,
+      targetLabel: getBoardTargetLabel(boardId, status),
+    };
+  }
+
+  function finishConvert(result) {
+    closeEditModal();
+
+    if (
+      window.PronoteProjectPicker &&
+      typeof window.PronoteProjectPicker.refreshAll === "function"
+    ) {
+      window.PronoteProjectPicker.refreshAll();
+    }
+    if (
+      window.PronoteAssigneePicker &&
+      typeof window.PronoteAssigneePicker.refreshAll === "function"
+    ) {
+      window.PronoteAssigneePicker.refreshAll();
+    }
+
+    if (window.PronoteApp && typeof window.PronoteApp.navigate === "function") {
+      window.PronoteApp.navigate(result.boardId, { section: result.section });
+    }
+  }
+
   function deleteNote(id) {
     const notes = loadNotes();
     const next = notes.filter(function (note) {
@@ -316,30 +471,8 @@
   }
 
   function renderHomeNotes() {
-    if (!homeListEl) return;
-
-    const allNotes = getAllNotes();
-    const items = allNotes.slice(0, HOME_NOTES_LIMIT);
-    const restCount = allNotes.length - items.length;
-    homeListEl.innerHTML = "";
-
-    if (items.length === 0) {
-      return;
-    }
-
-    items.forEach(function (note) {
-      renderNoteRow(note, homeListEl, { home: true });
-    });
-
-    if (restCount > 0) {
-      const li = document.createElement("li");
-      li.className = "done-list__more";
-      const a = document.createElement("a");
-      a.href = "#/notes";
-      a.setAttribute("data-route", "notes");
-      a.textContent = "Ещё " + restCount + "…";
-      li.appendChild(a);
-      homeListEl.appendChild(li);
+    if (typeof window.renderHomeToday === "function") {
+      window.renderHomeToday();
     }
   }
 
@@ -466,32 +599,10 @@
   }
 
   function bindForms() {
-    if (homeForm) {
-      homeForm.addEventListener("submit", handleCreateSubmit(homeForm, homeFormError, homeFormPanel, homeFormToggle));
-      homeForm.addEventListener("input", function () {
-        showFormError(homeFormError, "");
-      });
-    }
-
     if (pageForm) {
       pageForm.addEventListener("submit", handleCreateSubmit(pageForm, pageFormError, pageFormPanel, pageFormToggle));
       pageForm.addEventListener("input", function () {
         showFormError(pageFormError, "");
-      });
-    }
-
-    if (homeFormToggle) {
-      homeFormToggle.addEventListener("click", function () {
-        const open = homeFormPanel && homeFormPanel.hidden;
-        setFormPanelOpen(homeFormPanel, homeFormToggle, open);
-        if (!open) showFormError(homeFormError, "");
-      });
-    }
-
-    if (homeFormClose) {
-      homeFormClose.addEventListener("click", function () {
-        setFormPanelOpen(homeFormPanel, homeFormToggle, false);
-        showFormError(homeFormError, "");
       });
     }
 
@@ -580,6 +691,49 @@
       });
     }
 
+    if (editConvertBtn) {
+      editConvertBtn.addEventListener("click", function () {
+        if (!activeNoteId) return;
+
+        const formData = readEditFormData();
+        const title = (formData.title || "").trim();
+        if (!title) {
+          showFormError(editFormError, "Введите заголовок заметки.");
+          return;
+        }
+
+        const note = getNoteById(activeNoteId);
+        const target = resolveTargetBoard(formData.form, note || {});
+        const targetLabel = getBoardTargetLabel(target.boardRoute, target.section);
+        const noteTitle = note ? note.title : title;
+
+        function runConvert() {
+          const result = convertNoteToTask(activeNoteId, formData);
+          if (!result.ok) {
+            showFormError(editFormError, result.error || "Не удалось создать задачу.");
+            return;
+          }
+          finishConvert(result);
+        }
+
+        if (window.PronoteConfirm && typeof window.PronoteConfirm.open === "function") {
+          window.PronoteConfirm.open({
+            title: "Сделать задачей?",
+            message:
+              "«" +
+              noteTitle +
+              "» станет задачей в разделе «" +
+              targetLabel +
+              "» и будет удалена из заметок.",
+            confirmLabel: "Сделать задачей",
+            onConfirm: runConvert,
+          });
+        } else {
+          runConvert();
+        }
+      });
+    }
+
     window.addEventListener("keydown", function (e) {
       if (!editModal || editModal.hidden) return;
       if (e.key === "Escape") {
@@ -600,7 +754,9 @@
     update: updateNote,
     remove: deleteNote,
     getById: getNoteById,
+    convertToTask: convertNoteToTask,
+    openEdit: openEditModal,
   };
 
-  renderHomeNotes();
+  renderNotesPage();
 })();

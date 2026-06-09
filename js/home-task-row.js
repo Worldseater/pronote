@@ -13,24 +13,37 @@
     return datePart + ", " + timePart;
   }
 
-  function renderTagsCell(projectId, assigneeId) {
+  function renderProjectColumn(projectId) {
     const cell = document.createElement("span");
-    cell.className = "home-task-row__project";
+    cell.className = "home-task-row__project-col";
 
     if (projectId && window.PronoteProjects) {
       const badge = window.PronoteProjects.createBadgeElement(projectId);
       if (badge) {
         cell.appendChild(badge);
+        return cell;
       }
     }
+
+    cell.classList.add("home-task-row__project-col--empty");
+    cell.setAttribute("aria-hidden", "true");
+    return cell;
+  }
+
+  function renderAssigneeColumn(assigneeId) {
+    const cell = document.createElement("span");
+    cell.className = "home-task-row__assignee-col";
 
     if (assigneeId && window.PronoteAssignees) {
       const badge = window.PronoteAssignees.createBadgeElement(assigneeId);
       if (badge) {
         cell.appendChild(badge);
+        return cell;
       }
     }
 
+    cell.classList.add("home-task-row__assignee-col--empty");
+    cell.setAttribute("aria-hidden", "true");
     return cell;
   }
 
@@ -39,6 +52,9 @@
     li.className =
       "today-list__row home-task-row" + (item.hideProject ? " home-task-row--compact" : "");
 
+    const titleCell = document.createElement("div");
+    titleCell.className = "home-task-row__title-cell";
+
     const titleEl = document.createElement("button");
     titleEl.type = "button";
     titleEl.className = "home-task-row__title";
@@ -46,7 +62,13 @@
     if (item.onTitleClick) {
       titleEl.addEventListener("click", item.onTitleClick);
     }
-    li.appendChild(titleEl);
+    titleCell.appendChild(titleEl);
+    li.appendChild(titleCell);
+
+    if (!item.hideProject) {
+      li.appendChild(renderProjectColumn(item.projectId));
+      li.appendChild(renderAssigneeColumn(item.assigneeId));
+    }
 
     const boardEl = document.createElement("span");
     boardEl.className = "home-task-row__board";
@@ -56,8 +78,14 @@
     const statusEl = document.createElement("span");
     statusEl.className =
       "home-task-row__status" + (item.isDone ? " home-task-row__status--done" : "");
-    statusEl.textContent = item.statusLabel || "";
-    li.appendChild(statusEl);
+    if (item.statusLabel) {
+      statusEl.textContent = item.statusLabel;
+      li.appendChild(statusEl);
+    } else {
+      statusEl.setAttribute("aria-hidden", "true");
+      statusEl.classList.add("home-task-row__status--empty");
+      li.appendChild(statusEl);
+    }
 
     if (item.createdAt) {
       const dateEl = document.createElement("time");
@@ -65,10 +93,6 @@
       dateEl.dateTime = item.createdAt;
       dateEl.textContent = formatTaskCreatedAt(item.createdAt);
       li.appendChild(dateEl);
-    }
-
-    if (!item.hideProject) {
-      li.appendChild(renderTagsCell(item.projectId, item.assigneeId));
     }
 
     listEl.appendChild(li);

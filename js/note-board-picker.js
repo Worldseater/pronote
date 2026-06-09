@@ -189,7 +189,9 @@
   }
 
   function init() {
-    attachToForm(document.getElementById("homeNotesForm"));
+    attachToForm(document.getElementById("todayCreateForm"), {
+      before: ".modal__actions",
+    });
     attachToForm(document.getElementById("notesPageForm"));
     attachToForm(document.getElementById("noteEditForm"));
   }

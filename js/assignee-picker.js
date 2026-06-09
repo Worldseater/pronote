@@ -128,8 +128,8 @@
   }
 
   function init() {
-    attachToForm(document.getElementById("todayForm"), {
-      before: ".idea-form__actions",
+    attachToForm(document.getElementById("todayCreateForm"), {
+      before: ".modal__actions",
     });
     attachToForm(document.getElementById("editItemForm"), {
       before: "#editCommentsBlock",
@@ -142,9 +142,6 @@
     });
     attachToForm(document.getElementById("urgentForm"), {
       before: ".idea-form__actions",
-    });
-    attachToForm(document.getElementById("homeNotesForm"), {
-      before: "[data-note-board-picker]",
     });
     attachToForm(document.getElementById("notesPageForm"), {
       before: "[data-note-board-picker]",

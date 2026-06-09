@@ -53,6 +53,9 @@
   }
 
   function clampFontSize(size) {
+    if (size === "" || size === null || size === undefined) {
+      return DEFAULT_TEXT_SIZE;
+    }
     const n = Number(size);
     if (!Number.isFinite(n)) return DEFAULT_TEXT_SIZE;
     return Math.min(MAX_FONT_SIZE, Math.max(MIN_FONT_SIZE, Math.round(n)));

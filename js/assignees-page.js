@@ -65,6 +65,24 @@
     return "задач";
   }
 
+  function pluralRuNotes(count) {
+    const n = Math.abs(count) % 100;
+    const n1 = n % 10;
+    if (n > 10 && n < 20) return "заметок";
+    if (n1 > 1 && n1 < 5) return "заметки";
+    if (n1 === 1) return "заметка";
+    return "заметок";
+  }
+
+  function formatEntityMeta(taskCount, noteCount) {
+    const parts = [];
+
+    parts.push(taskCount + " " + pluralRuTasks(taskCount));
+    parts.push(noteCount + " " + pluralRuNotes(noteCount));
+
+    return parts.join(" · ");
+  }
+
   function pluralRuAssignees(count) {
     const n = Math.abs(count) % 100;
     const n1 = n % 10;
@@ -149,6 +167,40 @@
     return tasks;
   }
 
+  function collectNotes() {
+    let notes = [];
+
+    if (window.PronoteNotes && typeof window.PronoteNotes.getAll === "function") {
+      notes = window.PronoteNotes.getAll();
+    } else {
+      try {
+        const raw = localStorage.getItem("pronote.notes.v1");
+        if (!raw) return [];
+        const parsed = JSON.parse(raw);
+        if (!Array.isArray(parsed)) return [];
+        notes = parsed.filter(function (note) {
+          return note && (note.title || "").trim();
+        });
+      } catch (err) {
+        console.warn("Pronote: чтение заметок ответственного", err);
+        return [];
+      }
+    }
+
+    return notes
+      .map(function (note) {
+        return {
+          id: note.id,
+          title: note.title || "Без названия",
+          createdAt: note.createdAt,
+          assigneeId: note.assigneeId || null,
+        };
+      })
+      .sort(function (a, b) {
+        return a.title.localeCompare(b.title, "ru");
+      });
+  }
+
   function refreshAfterAssigneeChange() {
     if (
       window.PronoteAssigneePicker &&
@@ -161,6 +213,9 @@
     }
     if (typeof window.renderAllTasksPage === "function") {
       window.renderAllTasksPage();
+    }
+    if (typeof window.renderNotesPage === "function") {
+      window.renderNotesPage();
     }
     renderAssigneesPage();
   }
@@ -181,7 +236,7 @@
         message:
           "«" +
           assignee.name +
-          "» будет удалён. Задачи останутся, но без привязки к ответственному.",
+          "» будет удалён. Задачи и заметки останутся, но без привязки к ответственному.",
         confirmLabel: "Удалить",
         onConfirm: function () {
           window.PronoteConfirm.open({
@@ -337,7 +392,9 @@
     });
   }
 
-  function renderAssigneeBlock(assignee, tasks) {
+  function renderAssigneeBlock(assignee, tasks, notes) {
+    const taskItems = tasks || [];
+    const noteItems = notes || [];
     const section = document.createElement("section");
     section.className = "ideas-section assignees-page__section";
     section.dataset.assigneeId = assignee.id;
@@ -370,7 +427,7 @@
 
     const meta = document.createElement("p");
     meta.className = "page-head__meta";
-    meta.textContent = tasks.length + " " + pluralRuTasks(tasks.length);
+    meta.textContent = formatEntityMeta(taskItems.length, noteItems.length);
 
     content.appendChild(eyebrow);
     content.appendChild(title);
@@ -394,15 +451,15 @@
 
     const list = document.createElement("ul");
     list.className = "today-list assignees-page__tasks";
-    list.setAttribute("aria-label", "Задачи ответственного " + assignee.name);
+    list.setAttribute("aria-label", "Задачи и заметки ответственного " + assignee.name);
 
-    if (tasks.length === 0) {
+    if (taskItems.length === 0 && noteItems.length === 0) {
       const li = document.createElement("li");
       li.className = "today-list__empty";
-      li.textContent = "Нет активных задач";
+      li.textContent = "Нет активных задач и заметок";
       list.appendChild(li);
     } else {
-      tasks.forEach(function (task) {
+      taskItems.forEach(function (task) {
         if (window.PronoteRenderHomeTaskRow) {
           window.PronoteRenderHomeTaskRow(list, {
             title: task.title,
@@ -413,6 +470,26 @@
             onTitleClick: function () {
               if (window.PronoteEditItem && typeof window.PronoteEditItem.open === "function") {
                 window.PronoteEditItem.open(task.route, task.id);
+              }
+            },
+          });
+        }
+      });
+
+      noteItems.forEach(function (note) {
+        if (window.PronoteRenderHomeTaskRow) {
+          window.PronoteRenderHomeTaskRow(list, {
+            title: note.title,
+            boardTag: "Заметка",
+            statusLabel: "",
+            createdAt: note.createdAt,
+            hideProject: true,
+            onTitleClick: function () {
+              if (
+                window.PronoteNotes &&
+                typeof window.PronoteNotes.openEdit === "function"
+              ) {
+                window.PronoteNotes.openEdit(note.id);
               }
             },
           });
@@ -434,7 +511,9 @@
 
     const assignees = api.getAll();
     const tasks = collectActiveTasks();
+    const notes = collectNotes();
     const tasksByAssignee = {};
+    const notesByAssignee = {};
 
     tasks.forEach(function (task) {
       const key = task.assigneeId || "__none__";
@@ -442,6 +521,14 @@
         tasksByAssignee[key] = [];
       }
       tasksByAssignee[key].push(task);
+    });
+
+    notes.forEach(function (note) {
+      const key = note.assigneeId || "__none__";
+      if (!notesByAssignee[key]) {
+        notesByAssignee[key] = [];
+      }
+      notesByAssignee[key].push(note);
     });
 
     listEl.innerHTML = "";
@@ -460,7 +547,8 @@
 
     assignees.forEach(function (assignee) {
       const assigneeTasks = tasksByAssignee[assignee.id] || [];
-      listEl.appendChild(renderAssigneeBlock(assignee, assigneeTasks));
+      const assigneeNotes = notesByAssignee[assignee.id] || [];
+      listEl.appendChild(renderAssigneeBlock(assignee, assigneeTasks, assigneeNotes));
     });
 
     initDragAndDrop();

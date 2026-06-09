@@ -15,6 +15,7 @@
   const commentInput = document.getElementById("editCommentInput");
   const cancelBtn = document.getElementById("editModalCancel");
   const completeBtn = document.getElementById("editModalComplete");
+  const deleteBtn = document.getElementById("editModalDelete");
 
   if (!modal || !form || !cancelBtn) return;
 
@@ -74,6 +75,9 @@
     if (completeBtn) {
       completeBtn.hidden = false;
       completeBtn.disabled = false;
+    }
+    if (deleteBtn) {
+      deleteBtn.hidden = true;
     }
     showError("");
     if (lastFocus && typeof lastFocus.focus === "function") {
@@ -301,6 +305,9 @@
       completeBtn.hidden = isDone;
       completeBtn.disabled = isDone;
     }
+    if (deleteBtn) {
+      deleteBtn.hidden = !item.completedAt;
+    }
 
     fillBoardSelect(boardId);
     syncBoardFields(boardId, item);
@@ -409,6 +416,41 @@
     close();
   }
 
+  function handleDelete() {
+    if (!activeBoardId || !activeItemId) return;
+
+    const handler = getHandler(activeBoardId);
+    const meta = getMeta(activeBoardId);
+    if (!handler || typeof handler.getItem !== "function" || typeof handler.removeItem !== "function") {
+      return;
+    }
+
+    const item = handler.getItem(activeItemId);
+    if (!item || !item.completedAt) return;
+
+    const itemTitle = (item.title || "").trim() || (meta && meta.deleteFallbackName) || "Задача";
+
+    function runDelete() {
+      if (!handler.removeItem(activeItemId)) {
+        showError("Не удалось удалить задачу.");
+        return;
+      }
+      notifyHomeViews();
+      close();
+    }
+
+    if (window.PronoteConfirm && typeof window.PronoteConfirm.open === "function") {
+      window.PronoteConfirm.open({
+        title: "Удалить задачу?",
+        message: "«" + itemTitle + "» будет удалена без восстановления.",
+        confirmLabel: "Удалить",
+        onConfirm: runDelete,
+      });
+    } else {
+      runDelete();
+    }
+  }
+
   if (boardSelect) {
     boardSelect.addEventListener("change", handleBoardChange);
   }
@@ -422,6 +464,10 @@
 
   if (completeBtn) {
     completeBtn.addEventListener("click", handleComplete);
+  }
+
+  if (deleteBtn) {
+    deleteBtn.addEventListener("click", handleDelete);
   }
 
   if (backdrop) {

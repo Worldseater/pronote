@@ -297,7 +297,6 @@
       if (window.renderHomeToday) window.renderHomeToday();
       if (window.renderHomeUrgentPreview) window.renderHomeUrgentPreview();
       if (window.renderHomeDone) window.renderHomeDone();
-      if (window.renderHomeNotes) window.renderHomeNotes();
     }
 
     if (routeName === "done" && window.renderDonePage) {

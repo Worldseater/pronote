@@ -60,22 +60,7 @@
       { id: "discussed", title: "Обсудились" },
       { id: "future", title: "В будущем" },
     ],
-    seed: [
-      {
-        id: "seed-1",
-        title: "Блок отзывов на главной",
-        text: "Заказчик просит карусель с 3–4 отзывами под первым экраном. Нужны макет и тексты.",
-        status: "new",
-        createdAt: "2026-06-03T10:00:00.000Z",
-      },
-      {
-        id: "seed-2",
-        title: "Тёмная тема по умолчанию",
-        text: "Идея из ИИ-черновика: переключатель темы в шапке, сохранять выбор в localStorage.",
-        status: "new",
-        createdAt: "2026-06-02T14:30:00.000Z",
-      },
-    ],
+    seed: [],
   });
 
   window.PronoteIdeas = window.PronoteBoardHandlers.ideas;

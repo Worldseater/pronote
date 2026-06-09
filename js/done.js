@@ -112,6 +112,31 @@
     return done;
   }
 
+  function deleteDoneItem(item) {
+    const handler =
+      window.PronoteBoardHandlers && window.PronoteBoardHandlers[item.route];
+    if (!handler || typeof handler.removeItem !== "function") return;
+
+    const title = item.title || "Без названия";
+
+    function runDelete() {
+      handler.removeItem(item.id);
+      renderHomeDone();
+      renderDonePage();
+    }
+
+    if (window.PronoteConfirm && typeof window.PronoteConfirm.open === "function") {
+      window.PronoteConfirm.open({
+        title: "Удалить задачу?",
+        message: "«" + title + "» будет удалена без восстановления.",
+        confirmLabel: "Удалить",
+        onConfirm: runDelete,
+      });
+    } else {
+      runDelete();
+    }
+  }
+
   function renderDoneRow(item, listEl, options) {
     const opts = options || {};
 
@@ -136,7 +161,7 @@
     li.className = "today-list__row done-list__row";
 
     const titleCell = document.createElement("div");
-    titleCell.className = "today-list__title-cell";
+    titleCell.className = "today-list__title-cell done-list__title-cell";
 
     const a = document.createElement("a");
     a.className = "today-list__title";
@@ -150,6 +175,21 @@
       }
     });
     titleCell.appendChild(a);
+
+    if (!opts.home) {
+      const deleteButton = document.createElement("button");
+      deleteButton.type = "button";
+      deleteButton.className = "done-list__delete";
+      deleteButton.setAttribute("aria-label", "Удалить задачу");
+      deleteButton.title = "Удалить";
+      deleteButton.textContent = "×";
+      deleteButton.addEventListener("click", function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        deleteDoneItem(item);
+      });
+      titleCell.appendChild(deleteButton);
+    }
 
     if (item.projectId && window.PronoteProjects) {
       const badge = window.PronoteProjects.createBadgeElement(item.projectId);

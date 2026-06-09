@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Восстановление данных Pronote</title>
+    <style>
+      body {
+        font-family: system-ui, sans-serif;
+        max-width: 32rem;
+        margin: 3rem auto;
+        padding: 0 1.25rem;
+        line-height: 1.5;
+      }
+      .panel {
+        padding: 1.25rem;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+      }
+      button,
+      input[type="file"] {
+        margin-top: 1rem;
+      }
+      .ok {
+        color: #166534;
+      }
+      .err {
+        color: #b91c1c;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Восстановление данных Pronote</h1>
+    <p>Выберите файл <code>pronote-backup.json</code> с ноутбука. Данные запишутся в localStorage этого браузера для папки <code>pronote</code>.</p>
+
+    <div class="panel">
+      <label for="backupFile">Файл бэкапа</label><br />
+      <input id="backupFile" type="file" accept=".json,application/json" />
+      <p id="status" hidden></p>
+      <button type="button" id="openApp" hidden>Открыть Pronote</button>
+    </div>
+
+    <script>
+      var fileInput = document.getElementById("backupFile");
+      var statusEl = document.getElementById("status");
+      var openBtn = document.getElementById("openApp");
+
+      function showStatus(text, isError) {
+        statusEl.hidden = false;
+        statusEl.className = isError ? "err" : "ok";
+        statusEl.textContent = text;
+      }
+
+      fileInput.addEventListener("change", function () {
+        var file = fileInput.files && fileInput.files[0];
+        if (!file) return;
+
+        var reader = new FileReader();
+        reader.onload = function () {
+          try {
+            var backup = JSON.parse(String(reader.result || ""));
+            if (!backup || typeof backup !== "object" || Array.isArray(backup)) {
+              throw new Error("Ожидается JSON-объект с ключами localStorage.");
+            }
+
+            Object.entries(backup).forEach(function (entry) {
+              localStorage.setItem(entry[0], entry[1]);
+            });
+
+            showStatus("Готово: восстановлено " + Object.keys(backup).length + " ключей.", false);
+            openBtn.hidden = false;
+          } catch (err) {
+            showStatus("Ошибка: " + (err && err.message ? err.message : err), true);
+            openBtn.hidden = true;
+          }
+        };
+        reader.onerror = function () {
+          showStatus("Не удалось прочитать файл.", true);
+        };
+        reader.readAsText(file, "UTF-8");
+      });
+
+      openBtn.addEventListener("click", function () {
+        window.location.href = "index.html#/all";
+      });
+    </script>
+  </body>
+</html>

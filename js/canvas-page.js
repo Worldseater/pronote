@@ -982,9 +982,17 @@
     zoomAt(e.clientX, e.clientY, board.viewport.zoom + delta);
   }
 
+  function isCanvasTextInputTarget(target) {
+    return !!(
+      target &&
+      target.closest &&
+      target.closest('[contenteditable="true"], input, textarea, select')
+    );
+  }
+
   function handleKeyDown(e) {
     if (!isCanvasActive()) return;
-    if (e.code === "Space" && !spaceDown && !e.target.closest('[contenteditable="true"]')) {
+    if (e.code === "Space" && !spaceDown && !isCanvasTextInputTarget(e.target)) {
       spaceDown = true;
       updateViewportCursor();
       e.preventDefault();
@@ -996,7 +1004,7 @@
       renderAll();
     }
     if ((e.key === "Delete" || e.key === "Backspace") && selected &&
-        !e.target.closest('[contenteditable="true"]')) {
+        !isCanvasTextInputTarget(e.target)) {
       const a = api();
       const boardId = getBoardId();
       if (a && boardId) {
@@ -1121,7 +1129,15 @@
       sizeInput.addEventListener("change", function () {
         applyFontSize(sizeInput.value);
       });
+      sizeInput.addEventListener("blur", function () {
+        if (String(sizeInput.value).trim() === "") {
+          applyFontSize(api().DEFAULT_TEXT_SIZE);
+        } else {
+          applyFontSize(sizeInput.value);
+        }
+      });
       sizeInput.addEventListener("keydown", function (e) {
+        e.stopPropagation();
         if (e.key === "Enter") {
           e.preventDefault();
           applyFontSize(sizeInput.value);
